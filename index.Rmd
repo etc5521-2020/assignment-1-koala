@@ -1,10 +1,10 @@
 ---
 title: "ETC5521 Assignment 1"
-subtitle: "Your title"
-team: [FILL]
+subtitle: "How sustainable is the energy production in Europe? "
+team: Koala
 author:
-  - [FILL]
-  - [FILL]
+  - Patu Saputra 
+  - Vinny Vu
 date: "`r Sys.Date()`"
 output: 
   html_document
@@ -17,9 +17,20 @@ output:
 
 [FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
 
+## Questions of Discussion 
+
+How sustainable is the energy production in Europe? 
+
+* Which countries have the highest production of sustainable energy?
+*  What is the trend in energy usage in Europe?  
+* What is the trend in sustainable vs unsustainable energy production?
+
+
+
 # Data description
 
 # Analysis and findings
+
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
