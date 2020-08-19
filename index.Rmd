@@ -43,6 +43,7 @@ Specifically:
 
 # Data description
 
+
 # Analysis and findings
 
 ```{r, include=FALSE}
@@ -56,10 +57,7 @@ energy_types <- tuesdata$energy_types
 country_totals <- tuesdata$country_totals
 ```
 
-```{r}
-energy_types <- tuesdata$energy_types
-country_totals <- tuesdata$country_totals
-```
+
 
 
 ```{r}
@@ -103,8 +101,184 @@ country_totals %>%
   geom_col() +  
   ggtitle("Belgium Energy Totals")
 ```
+## Which countries have the highest production of sustainable energy?
 
 
+## What is the trend in energy usage in Europe?  
+
+
+## What is the trend in sustainable vs unsustainable energy production?
+```{r}
+eng_2018 <- energy_types %>%
+  select(-"2017", -"2016") %>%
+  rename(energy = "2018") %>%
+  filter(type != "Pumped hydro power") %>%
+  pivot_wider(id_cols = c(country, country_name, level),
+              names_from = type,
+              values_from = energy) %>%
+  mutate(total = `Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
+  pivot_longer(cols = -c(country,country_name,level,total),
+               names_to = "name",
+               values_to = "value") %>%
+  mutate(proportion = value/total)
+              
+eng_2018 %>%
+  arrange(-total)
+```
+
+```{r}
+eng_2017 <- energy_types %>%
+  select(-"2018", -"2016") %>%
+  rename(energy = "2017") %>%
+  filter(type != "Pumped hydro power") %>%
+  pivot_wider(id_cols = c(country, country_name, level),
+              names_from = type,
+              values_from = energy) %>%
+  mutate(total = `Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
+  pivot_longer(cols = -c(country,country_name,level,total),
+               names_to = "name",
+               values_to = "value") %>%
+  mutate(proportion = value/total)
+```
+
+```{r}
+eng_2016 <- energy_types %>%
+  select(-"2018", -"2017") %>%
+  rename(energy = "2016") %>%
+  filter(type != "Pumped hydro power") %>%
+  pivot_wider(id_cols = c(country, country_name, level),
+              names_from = type,
+              values_from = energy) %>%
+  mutate(total = `Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
+  pivot_longer(cols = -c(country,country_name,level,total),
+               names_to = "name",
+               values_to = "value") %>%
+  mutate(proportion = value/total)
+```
+
+```{r}
+eng_2016 %>%
+  ggplot(aes(x = reorder(country, -total),
+             y = proportion,
+             fill = name)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+```{r}
+eng_2017 %>%
+  ggplot(aes(x = reorder(country, -total),
+             y = proportion,
+             fill = name)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+```{r}
+eng_2018
+```
+
+
+```{r}
+eng_2018 %>%
+  ggplot(aes(x = reorder(country, -total),
+             y = proportion,
+             fill = name)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+```{r}
+tot_2016 <- energy_types %>%
+ select(-"2018", -"2017") %>%
+ rename(energy = "2016") %>%
+ filter(type != "Pumped hydro power") %>%
+ pivot_wider(id_cols = c(country, country_name, level),
+             names_from = type,
+             values_from = energy) %>%
+ summarise(Year = 2016,
+           `Conventional thermal` = -sum(`Conventional thermal`),
+           Nuclear = sum(Nuclear),
+           Hydro = sum(Hydro),
+           Wind = sum(Wind),
+           Solar = sum(Solar),
+           Geothermal = sum(Geothermal),
+           Other = sum(Other))
+
+tot_2017 <- energy_types %>%
+ select(-"2018", -"2016") %>%
+ rename(energy = "2017") %>%
+ filter(type != "Pumped hydro power") %>%
+ pivot_wider(id_cols = c(country, country_name, level),
+             names_from = type,
+             values_from = energy) %>%
+ summarise(Year = 2017,
+           `Conventional thermal` = -sum(`Conventional thermal`),
+           Nuclear = sum(Nuclear),
+           Hydro = sum(Hydro),
+           Wind = sum(Wind),
+           Solar = sum(Solar),
+           Geothermal = sum(Geothermal),
+           Other = sum(Other))
+
+
+tot_2018 <- energy_types %>%
+ select(-"2017", -"2016") %>%
+ rename(energy = "2018") %>%
+ filter(type != "Pumped hydro power") %>%
+ pivot_wider(id_cols = c(country, country_name, level),
+             names_from = type,
+             values_from = energy) %>%
+ summarise(Year = 2018,
+           `Conventional thermal` = -sum(`Conventional thermal`),
+           Nuclear = sum(Nuclear),
+           Hydro = sum(Hydro),
+           Wind = sum(Wind),
+           Solar = sum(Solar),
+           Geothermal = sum(Geothermal),
+           Other = sum(Other))
+
+
+tot <- bind_rows(tot_2016,tot_2017,tot_2018) %>%
+  mutate(total = -`Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  pivot_longer(cols = -c(Year,total),
+               names_to = "name",
+               values_to = "value") %>%
+  mutate(proportion = value/total)
+tot
+```
+
+```{r}
+tot 
+```
+
+
+```{r}
+tot %>%
+  ggplot(aes(x = Year,
+             y = proportion,
+             fill = name)) +
+  geom_col()
+```
+```{r}
+tot %>%
+  ggplot(aes(x = Year,
+             y = value,
+             fill = name)) +
+  geom_col()
+```
+
+
+
+```{r}
+eng %>%
+  ggplot(aes(x = reorder(country, -total),
+             y = proportion,
+             fill = name,
+             width = total)) +
+  geom_col()
+```
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
