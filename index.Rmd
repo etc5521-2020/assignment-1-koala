@@ -12,6 +12,14 @@ output:
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(kableExtra)
+```
 
 # Introduction and motivation
 
@@ -28,6 +36,65 @@ How sustainable is the energy production in Europe?
 
 
 # Data description
+
+```{r, include = FALSE}
+energy_types <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
+country_totals <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
+
+energy_types <- energy_types %>% 
+    pivot_longer(cols = starts_with("20"),
+               names_to = "year",
+               values_to = "energy")
+energy_types$year <- as.numeric(energy_types$year)
+
+country_totals <- country_totals %>% 
+  pivot_longer(cols = starts_with("20"),
+               names_to = "year",
+               values_to = "energy")
+country_totals$year <- as.numeric(country_totals$year)
+```
+
+The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
+The variables in the `energy_types` table are included below:
+
+```{r,include = FALSE}
+variables_1 <- energy_types %>% names()
+class_1 <- sapply(energy_types, class)
+desc_1 <- c("Country ID",
+           "Country name",
+           "Type of energy production",
+           "Level - either total, level 1 or level 2. Where level 2 makes up level 1 that makes up the total",
+           "Year of observation",
+           "Energy in GWh (Gigawatt hours)")
+```
+
+```{r, echo=FALSE}
+tibble(variables_1,class_1,desc_1) %>%
+  kable(col.names = c("variable","class","description")) %>%
+  kable_styling(bootstrap_options = "hover")
+```
+
+The variables in the `country_totals` table are included below: 
+
+```{r, include = FALSE}
+variables_2 <- country_totals %>% names()
+class_2 <- sapply(country_totals, class)
+desc_2 <- c("Country ID",
+           "Country name",
+           "Type of energy production",
+           "Level - either total, level 1 or level 2. Where level 2 makes up level 1 that makes up the total",
+           "Year of observation",
+           "Energy in GWh (Gigawatt hours)")
+```
+
+```{r, echo=FALSE}
+tibble(variables_2,class_2,desc_2) %>%
+  kable(col.names = c("variable","class","description")) %>%
+  kable_styling(bootstrap_options = "hover")
+```
+
+The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information.  
+
 
 # Analysis and findings
 
