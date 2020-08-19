@@ -12,6 +12,15 @@ output:
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r loading-packages, include=FALSE}
+library(tidytuesdayR)
+library(tidyverse)
+library(kableExtra)
+```
 
 # Introduction and motivation
 
@@ -30,6 +39,61 @@ How sustainable is the energy production in Europe?
 # Data description
 
 # Analysis and findings
+
+```{r, include=FALSE}
+#loading European Energy data
+
+tuesdata <- tidytuesdayR::tt_load(2020, week = 32)
+```
+
+```{r}
+#Obtaining energy types and country totals data sets 
+energy_types <- tuesdata$energy_types
+country_totals <- tuesdata$country_totals
+```
+
+```{r}
+head(energy_types) %>%
+  kable(caption = "Energy Types") %>%
+  kable_styling(bootstrap_options = "striped",
+                latex_options = "hold_position")
+
+head(country_totals) %>%
+  kable(caption = "Energy Types") %>%
+  kable_styling(bootstrap_options = "striped",
+                latex_options = "hold_position")
+```
+
+```{r}
+energy_types %>%
+  pivot_longer(cols = c("2016","2017","2018"),
+               names_to = "Year",
+               values_to = "Production") %>%
+  mutate(Year = as.numeric(Year)) %>%
+  filter(country_name == "Belgium") %>% 
+  ggplot(aes(x = Year,
+             y = Production,
+             fill = type)) +
+  geom_col() +
+  ggtitle("Belgium Energy Types")
+```
+
+
+
+```{r}
+country_totals %>%
+  pivot_longer(cols = c("2016","2017","2018"),
+               names_to = "Year",
+               values_to = "Production") %>%
+  mutate(Year = as.numeric(Year)) %>%
+  filter(country_name == "Belgium") %>%
+  ggplot(aes(x = Year,
+             y = Production,
+             fill = type)) +
+  geom_col() +  
+  ggtitle("Belgium Energy Totals")
+```
+
 
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
