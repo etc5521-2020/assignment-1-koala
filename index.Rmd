@@ -26,12 +26,17 @@ library(kableExtra)
 
 [FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
 
-## Questions of Discussion 
+In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (Peninsula Clean Energy, 2018.) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (NASA, 2007.) Not only does thermal power produced by fossil fuels emit green house gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
+
+As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” (European Power sector, 2017) in favor cleaner, renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) assess how successful they currently are and answer the question:  
+
 
 How sustainable is the energy production in Europe? 
 
+Specifically:
+
 * Which countries have the highest production of sustainable energy?
-*  What is the trend in energy usage in Europe?  
+* What is the trend in energy usage in Europe?  
 * What is the trend in sustainable vs unsustainable energy production?
 
 
@@ -42,7 +47,6 @@ How sustainable is the energy production in Europe?
 
 ```{r, include=FALSE}
 #loading European Energy data
-
 tuesdata <- tidytuesdayR::tt_load(2020, week = 32)
 ```
 
@@ -51,6 +55,12 @@ tuesdata <- tidytuesdayR::tt_load(2020, week = 32)
 energy_types <- tuesdata$energy_types
 country_totals <- tuesdata$country_totals
 ```
+
+```{r}
+energy_types <- tuesdata$energy_types
+country_totals <- tuesdata$country_totals
+```
+
 
 ```{r}
 head(energy_types) %>%
@@ -99,3 +109,13 @@ country_totals %>%
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
 # References
+https://github.com/etc5521-2020/assignment-1-koala/blob/master/index.Rmd
+
+https://svs.gsfc.nasa.gov/20114#:~:text=The%20'greenhouse%20effect'%20is%20the,radiating%20from%20Earth%20toward%20space.&text=The%20gases%20that%20contribute%20to,%2C%20and%20chlorofluorocarbons%20(CFCs).
+
+https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-clean-and-renewable-energy/
+
+https://ember-climate.org/wp-content/uploads/2018/01/EU-power-sector-report-2017.pdf
+
+
+
