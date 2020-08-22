@@ -112,4 +112,41 @@ total_year <- country_totals %>%
 return(total_year)
 }
 
+country_total_2016 <- extract_total_net(2016)
+country_total_2017 <- extract_total_net(2017)
+country_total_2018 <-extract_total_net(2018)
+
+extract_energy <- function(x){
+total_year <- energy_types %>% 
+  filter(year==x, level == "Level 1") %>%
+  select(-country) %>%
+  pivot_wider(names_from = "type", values_from ="energy")
+return(total_year)
+}
+
+en_types_2016 <- extract_energy(2016)
+en_types_2017 <- extract_energy(2017)
+en_types_2018 <- extract_energy(2018)
+
+energy_contribution <- function(df1,df2){
+df1 %>%
+  inner_join(df2, by="country_name") %>%
+  select(-year.y) %>%
+  rename(year=year.x) %>%
+  mutate(thermal_con = round(`Conventional thermal`/Total*100, digits = 2),
+         nuclear_con = round(Nuclear/Total*100, digits = 2),
+         hydro_con = round(Hydro/Total*100, digits = 2),
+         wind_con = round(Wind/Total*100, digits = 2),
+         solar_con = round(Solar/Total*100, digits = 2),
+         geothermal_con = round(Geothermal/Total*100, digits = 2),
+         other_con = round(Other/Total*100, digits = 2)) %>%
+    select(-c(`Conventional thermal`, Nuclear, Hydro, Wind, Solar, Geothermal,Other,Total, level)) 
+}
+
+energy_contribution_2016 <- energy_contribution(en_types_2016,country_total_2016)
+energy_contribution_2017 <- energy_contribution(en_types_2017,country_total_2017)
+energy_contribution_2018 <- energy_contribution(en_types_2018,country_total_2018)
+```
+
+
 # References
