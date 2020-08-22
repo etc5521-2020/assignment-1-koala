@@ -41,13 +41,15 @@ How sustainable is the energy production in Europe?
 energy_types <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
 country_totals <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
 
-energy_types <- energy_types %>% 
+energy_types <- energy_types %>%
+  replace_na(list(country_name = "United Kingdom")) %>%
     pivot_longer(cols = starts_with("20"),
                names_to = "year",
                values_to = "energy")
 energy_types$year <- as.numeric(energy_types$year)
 
 country_totals <- country_totals %>% 
+  replace_na(list(country_name = "United Kingdom")) %>%
   pivot_longer(cols = starts_with("20"),
                names_to = "year",
                values_to = "energy")
@@ -103,7 +105,7 @@ The data in the tidytuesday package only contains yearly totals from 2016-2018. 
 
 ## Energy types contribution to total energy production for each country in Europe
 
-```{r contribution-tbl, include=FALSE}
+```{r contribution-tbl-country, include=FALSE, warning=FALSE, message=FALSE}
 extract_total_net <- function(x){
 total_year <- country_totals %>% 
   filter(type=="Total net production", year==x) %>%
@@ -133,13 +135,13 @@ df1 %>%
   inner_join(df2, by="country_name") %>%
   select(-year.y) %>%
   rename(year=year.x) %>%
-  mutate(thermal_con = round(`Conventional thermal`/Total*100, digits = 2),
-         nuclear_con = round(Nuclear/Total*100, digits = 2),
-         hydro_con = round(Hydro/Total*100, digits = 2),
-         wind_con = round(Wind/Total*100, digits = 2),
-         solar_con = round(Solar/Total*100, digits = 2),
-         geothermal_con = round(Geothermal/Total*100, digits = 2),
-         other_con = round(Other/Total*100, digits = 2)) %>%
+  mutate(thermal = round(`Conventional thermal`/Total*100, digits = 2),
+         nuclear = round(Nuclear/Total*100, digits = 2),
+         hydro = round(Hydro/Total*100, digits = 2),
+         wind = round(Wind/Total*100, digits = 2),
+         solar = round(Solar/Total*100, digits = 2),
+         geothermal = round(Geothermal/Total*100, digits = 2),
+         other = round(Other/Total*100, digits = 2)) %>%
     select(-c(`Conventional thermal`, Nuclear, Hydro, Wind, Solar, Geothermal,Other,Total, level)) 
 }
 
@@ -148,5 +150,106 @@ energy_contribution_2017 <- energy_contribution(en_types_2017,country_total_2017
 energy_contribution_2018 <- energy_contribution(en_types_2018,country_total_2018)
 ```
 
+```{r tbl-contribution-europe, include=FALSE, warning=FALSE, message=FALSE}
+get_total <- function(df1,df2,df3){
+  df1 <- df1 %>%
+  summarise(year=min(year), Total = sum(Total))
+  df2 <- df2 %>%
+  summarise(year=min(year), Total = sum(Total))
+  df3 <- df3 %>%
+  summarise(year=min(year),Total = sum(Total))
+ rbind(df1,df2,df3) 
+}
+
+europe_total_production <- get_total(country_total_2016,country_total_2017,country_total_2018)
+
+europe_energy_cont <- function(df){
+  df %>%
+  summarise(year = min(year),
+            Geothermal = sum(Geothermal),
+            Nuclear = sum(Nuclear),
+            Hydro = sum(Hydro),
+            Wind = sum(Wind),
+            Solar = sum(Solar),
+            `Conventional thermal` = sum(`Conventional thermal`),
+            Other = sum(Other))
+}
+
+europe_total_energy <- rbind(europe_energy_cont(en_types_2016),
+                           europe_energy_cont(en_types_2017),
+                           europe_energy_cont(en_types_2018))
+
+europe_energy_contribution <- function(df1,df2){
+df1 %>%
+  left_join(df2, by="year") %>%
+  mutate(Thermal = round(`Conventional thermal`/Total*100, digits = 2),
+         Nuclear = round(Nuclear/Total*100, digits = 2),
+         Hydro = round(Hydro/Total*100, digits = 2),
+         Wind = round(Wind/Total*100, digits = 2),
+         Solar = round(Solar/Total*100, digits = 2),
+         Geothermal = round(Geothermal/Total*100, digits = 2),
+         Other = round(Other/Total*100, digits = 2)) %>%
+    select(-c(`Conventional thermal`, Total)) 
+}
+
+contribute_to_europe <- europe_energy_contribution(europe_total_energy,
+                                                   europe_total_production)
+```
+
+```{r piechart-europe, echo=FALSE, warning=FALSE, message=FALSE}
+library(plotly)
+p <- contribute_to_europe %>%
+    pivot_longer(cols=c(2:8),
+                 names_to = "contribution",
+                 values_to = "value")
+ p %>%
+   plot_ly(labels = ~contribution,
+          values = ~value,
+          textposition = 'outside',
+          textinfo = 'label+percent') %>%
+   add_pie(data = filter(p, year==2016), name = "2016", domain = list(row = 0, column = 0)) %>%
+  add_pie(data = filter(p, year==2017), name = "2017", domain = list(row = 0, column = 2)) %>%
+  add_pie(data = filter(p, year==2018), name = "2018",domain = list(row = 0, column = 4)) %>%
+   layout(title = 'Energy source contribution to the total production in Europe (%) 2016,2017,2018',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         showlegend = F,
+         grid=list(rows=1, columns=5))
+
+ 
+```
+
+```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE}
+create_plot <- function(df){
+year <- paste0(df$year[1])
+df_tbl <-  df %>%
+    pivot_longer(cols=c(3:9),
+                 names_to = "contribution",
+                 values_to = "value") 
+df_tbl$contribution = factor(df_tbl$contribution, levels=c('hydro','wind','solar','nuclear','thermal','geothermal','other'))
+  
+df_tbl %>%
+  ggplot(aes(x=country_name, y= value, fill= contribution)) +
+  geom_col(position = "stack") +
+  theme_minimal() +
+  facet_wrap(~contribution, ncol=7) +
+  coord_flip() +
+  ggtitle("Energy source contribution to the total production in %",year)+
+    ylab("percentage") +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size=7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size=6),
+        plot.title = element_text(size = 10, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "bold"))
+}
+
+create_plot(energy_contribution_2016)
+create_plot(energy_contribution_2017)
+create_plot(energy_contribution_2018)
+```
+
 
 # References
+
