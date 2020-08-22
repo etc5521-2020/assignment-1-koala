@@ -42,16 +42,20 @@ energy_types <- readr::read_csv('https://raw.githubusercontent.com/rfordatascien
 country_totals <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
 
 energy_types <- energy_types %>% 
+  replace_na(list(country_name = "United Kingdom")) %>%
     pivot_longer(cols = starts_with("20"),
                names_to = "year",
                values_to = "energy")
 energy_types$year <- as.numeric(energy_types$year)
 
-country_totals <- country_totals %>% 
+country_totals <- country_totals %>%
+  replace_na(list(country_name = "United Kingdom")) %>%
   pivot_longer(cols = starts_with("20"),
                names_to = "year",
                values_to = "energy")
 country_totals$year <- as.numeric(country_totals$year)
+
+
 ```
 
 The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
@@ -100,5 +104,6 @@ The data in the tidytuesday package only contains yearly totals from 2016-2018. 
 
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
+
 
 # References
