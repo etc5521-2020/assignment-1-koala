@@ -61,10 +61,6 @@ country_totals <- country_totals %>%
 country_totals$year <- as.numeric(country_totals$year)
 ```
 
-```{r}
-energy_types_wide <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
-country_totals_wide <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
-```
 
 
 The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
@@ -139,44 +135,30 @@ energy_types %>%
   geom_col() +
   theme(axis.text.x = element_text(angle = 90))
 ```
+
+
 ```{r}
 energy_types %>%
-  filter(year == 2017,
-         type != "Pumped hydro power") %>%
-  select(-level) %>%
-  pivot_wider(id_cols = c(country, country_name, year),
+  filter(type != "Pumped hydro power") %>%
+  group_by(country_name,type) %>%
+  summarise(average_energy = mean(energy)) %>%
+  pivot_wider(id_cols = country_name,
               names_from = type,
-              values_from = energy) %>%
+              values_from = average_energy) %>%
   mutate(Total_Renewable = Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
   mutate(`Conventional thermal` = -`Conventional thermal`) %>%
-  pivot_longer(cols = -c(country,country_name,year,Total_Renewable),
+  pivot_longer(cols = -c(country_name,Total_Renewable),
                names_to = "Energy Type",
                values_to = "value") %>%
   ggplot(aes(x = reorder(country_name,-Total_Renewable),
              y = value,
              fill = `Energy Type`)) +
   geom_col() +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "Average Renewable vs Non-Renewable Energy Production by Country from 2016-2018",
+         x = "")
 ```
-```{r}
-energy_types %>%
-  filter(year == 2016,
-         type != "Pumped hydro power") %>%
-  select(-level) %>%
-  pivot_wider(id_cols = c(country, country_name, year),
-              names_from = type,
-              values_from = energy) %>%
-  mutate(Total_Renewable = Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
-  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
-  pivot_longer(cols = -c(country,country_name,year,Total_Renewable),
-               names_to = "Energy Type",
-               values_to = "value") %>%
-  ggplot(aes(x = reorder(country_name,-Total_Renewable),
-             y = value,
-             fill = `Energy Type`)) +
-  geom_col() +
-  theme(axis.text.x = element_text(angle = 90))
-```
+
 
 ```{r}
 energy_types %>%
@@ -191,14 +173,91 @@ energy_types %>%
                names_to = "type",
                values_to = "total") %>%
   ggplot(aes(x = reorder(type,-total),
-             y = total)) +
+             y = total,
+             fill = type)) +
   geom_col() +
   facet_wrap(~year) +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "Total Energy Production by Type and Year",
+       x = "")
 ```
 
 
 ## How do energy imports vs exports compare between countries in Europe from 2016-2018?
+
+```{r}
+country_totals
+```
+
+```{r}
+country_totals %>%
+  group_by(country_name,type) %>%
+  summarise(average = mean(energy)) %>%
+  pivot_wider(id_cols = country_name,
+              names_from = type,
+              values_from = average) %>%
+  mutate(Imports = -Imports) %>%
+  pivot_longer(cols = -country_name,
+               names_to = "Type",
+               values_to = "Energy") %>%
+  filter(Type %in% c("Imports", "Exports")) %>%
+  ggplot(aes(x = country_name,
+             y = Energy,
+             fill = Type)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
+  
+```
+
+```{r}
+country_totals %>%
+  group_by(country_name,type) %>%
+  summarise(average = mean(energy)) %>%
+  pivot_wider(id_cols = country_name,
+              names_from = type,
+              values_from = average) %>%
+  mutate(Imports = -Imports) %>%
+  select(country_name,Exports,Imports,`Total net production`) %>%
+  mutate(net_import_export = Exports + Imports) %>%
+  pivot_longer(cols = -c(country_name,`Total net production`, net_import_export),
+               names_to = "Type",
+               values_to = "Energy") %>%
+  ggplot(aes(x = reorder(country_name,-net_import_export))) +
+  geom_col(aes(y = Energy,
+               fill = Type)) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+```{r}
+country_totals %>%
+  group_by(country_name,type) %>%
+  summarise(average = mean(energy)) %>%
+  pivot_wider(id_cols = country_name,
+              names_from = type,
+              values_from = average) %>%
+  mutate(Imports = -Imports) %>%
+  select(country_name,Exports,Imports,`Total net production`) %>%
+  ungroup() %>%
+  summarise(Exports = sum(Exports),
+            Imports = sum(Imports),
+            `Total net production` = sum(`Total net production`))
+```
+```{r}
+country_totals %>%
+  group_by(country_name,type) %>%
+  summarise(average = mean(energy)) %>%
+  pivot_wider(id_cols = country_name,
+              names_from = type,
+              values_from = average) %>%
+  mutate(Imports = -Imports) %>%
+  select(country_name,Exports,Imports,`Total net production`) %>%
+  replace_na(list(Exports = 0)) %>%
+  ungroup() %>%
+  summarise(Exports = sum(Exports),
+            Imports = sum(Imports),
+            `Total net production` = sum(`Total net production`)) %>%
+  mutate(`Net Imports and Exports` = Exports + Imports )
+```
 
 
 ## How the contributions of the sources to the production of electricity
