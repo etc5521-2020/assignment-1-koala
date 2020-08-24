@@ -28,6 +28,8 @@ library(kableExtra)
 
 In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (Peninsula Clean Energy, 2018.) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (NASA, 2007.) Not only does thermal power produced by fossil fuels emit green house gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
 
+Per Our World Data Europe is currently the 3rd highest consumer of primary energy behind Asia pacific and North America making up approximately 15% of the total World Energy Consumption (Our World Data, 2019).  
+
 As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” (European Power sector, 2017) in favor cleaner, renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) assess how successful they currently are and answer the question:  
 
 
@@ -35,250 +37,171 @@ How sustainable is the energy production in Europe?
 
 Specifically:
 
-* Which countries have the highest production of sustainable energy?
-* What is the trend in energy usage in Europe?  
-* What is the trend in sustainable vs unsustainable energy production?
-
+1. Which countries have the highest production of sustainable energy based on energy types? 
+2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
+3. How the contributions of the sources to the production of electricity
 
 
 # Data description
 
+```{r, include = FALSE}
+energy_types <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
+country_totals <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
+energy_types <- energy_types %>%
+  replace_na(list(country_name = "United Kingdom")) %>%
+    pivot_longer(cols = starts_with("20"),
+               names_to = "year",
+               values_to = "energy")
+energy_types$year <- as.numeric(energy_types$year)
+country_totals <- country_totals %>% 
+  replace_na(list(country_name = "United Kingdom")) %>%
+  pivot_longer(cols = starts_with("20"),
+               names_to = "year",
+               values_to = "energy")
+country_totals$year <- as.numeric(country_totals$year)
+```
+
+```{r}
+energy_types_wide <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
+country_totals_wide <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
+```
+
+
+The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
+The variables in the `energy_types` table are included below:
+
+```{r,include = FALSE}
+variables_1 <- energy_types %>% names()
+class_1 <- sapply(energy_types, class)
+desc_1 <- c("Country ID",
+           "Country name",
+           "Type of energy production",
+           "Level - either total, level 1 or level 2. Where level 2 makes up level 1 that makes up the total",
+           "Year of observation",
+           "Energy in GWh (Gigawatt hours)")
+```
+
+```{r, echo=FALSE}
+tibble(variables_1,class_1,desc_1) %>%
+  kable(col.names = c("variable","class","description")) %>%
+  kable_styling(bootstrap_options = "hover")
+```
+
+The variables in the `country_totals` table are included below: 
+
+```{r, include = FALSE}
+variables_2 <- country_totals %>% names()
+class_2 <- sapply(country_totals, class)
+desc_2 <- c("Country ID",
+           "Country name",
+           "Type of energy production",
+           "Level - either total, level 1 or level 2. Where level 2 makes up level 1 that makes up the total",
+           "Year of observation",
+           "Energy in GWh (Gigawatt hours)")
+```
+
+```{r, echo=FALSE}
+tibble(variables_2,class_2,desc_2) %>%
+  kable(col.names = c("variable","class","description")) %>%
+  kable_styling(bootstrap_options = "hover")
+```
+
+The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information.  
+
+
 
 # Analysis and findings
 
-```{r, include=FALSE}
-#loading European Energy data
-tuesdata <- tidytuesdayR::tt_load(2020, week = 32)
-```
 
-```{r}
-#Obtaining energy types and country totals data sets 
-energy_types <- tuesdata$energy_types
-country_totals <- tuesdata$country_totals
-```
+
+
+##  Which countries have the highest production of sustainable energy based on energy types? 
 
 
 
 
 ```{r}
-head(energy_types) %>%
-  kable(caption = "Energy Types") %>%
-  kable_styling(bootstrap_options = "striped",
-                latex_options = "hold_position")
-
-head(country_totals) %>%
-  kable(caption = "Energy Types") %>%
-  kable_styling(bootstrap_options = "striped",
-                latex_options = "hold_position")
+energy_types %>%
+  filter(year == 2018,
+         type != "Pumped hydro power") %>%
+  select(-level) %>%
+  pivot_wider(id_cols = c(country, country_name, year),
+              names_from = type,
+              values_from = energy) %>%
+  mutate(Total_Renewable = Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
+  pivot_longer(cols = -c(country,country_name,year,Total_Renewable),
+               names_to = "Energy Type",
+               values_to = "value") %>%
+  ggplot(aes(x = reorder(country_name,-Total_Renewable),
+             y = value,
+             fill = `Energy Type`)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+```{r}
+energy_types %>%
+  filter(year == 2017,
+         type != "Pumped hydro power") %>%
+  select(-level) %>%
+  pivot_wider(id_cols = c(country, country_name, year),
+              names_from = type,
+              values_from = energy) %>%
+  mutate(Total_Renewable = Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
+  pivot_longer(cols = -c(country,country_name,year,Total_Renewable),
+               names_to = "Energy Type",
+               values_to = "value") %>%
+  ggplot(aes(x = reorder(country_name,-Total_Renewable),
+             y = value,
+             fill = `Energy Type`)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+```{r}
+energy_types %>%
+  filter(year == 2016,
+         type != "Pumped hydro power") %>%
+  select(-level) %>%
+  pivot_wider(id_cols = c(country, country_name, year),
+              names_from = type,
+              values_from = energy) %>%
+  mutate(Total_Renewable = Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
+  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
+  pivot_longer(cols = -c(country,country_name,year,Total_Renewable),
+               names_to = "Energy Type",
+               values_to = "value") %>%
+  ggplot(aes(x = reorder(country_name,-Total_Renewable),
+             y = value,
+             fill = `Energy Type`)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ```{r}
 energy_types %>%
-  pivot_longer(cols = c("2016","2017","2018"),
-               names_to = "Year",
-               values_to = "Production") %>%
-  mutate(Year = as.numeric(Year)) %>%
-  filter(country_name == "Belgium") %>% 
-  ggplot(aes(x = Year,
-             y = Production,
-             fill = type)) +
+  filter(level != "Level 2") %>%
+  group_by(type,year) %>%
+  summarise(total = sum(energy)) %>%
+  pivot_wider(id_cols = year,
+              names_from = type,
+              values_from = total) %>%
+  mutate(Total_Renewable = Geothermal + Hydro + Nuclear + Other + Solar + Wind) %>%
+  pivot_longer(cols = -year,
+               names_to = "type",
+               values_to = "total") %>%
+  ggplot(aes(x = reorder(type,-total),
+             y = total)) +
   geom_col() +
-  ggtitle("Belgium Energy Types")
-```
-
-
-
-```{r}
-country_totals %>%
-  pivot_longer(cols = c("2016","2017","2018"),
-               names_to = "Year",
-               values_to = "Production") %>%
-  mutate(Year = as.numeric(Year)) %>%
-  filter(country_name == "Belgium") %>%
-  ggplot(aes(x = Year,
-             y = Production,
-             fill = type)) +
-  geom_col() +  
-  ggtitle("Belgium Energy Totals")
-```
-## Which countries have the highest production of sustainable energy?
-
-
-## What is the trend in energy usage in Europe?  
-
-
-## What is the trend in sustainable vs unsustainable energy production?
-```{r}
-eng_2018 <- energy_types %>%
-  select(-"2017", -"2016") %>%
-  rename(energy = "2018") %>%
-  filter(type != "Pumped hydro power") %>%
-  pivot_wider(id_cols = c(country, country_name, level),
-              names_from = type,
-              values_from = energy) %>%
-  mutate(total = `Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
-  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
-  pivot_longer(cols = -c(country,country_name,level,total),
-               names_to = "name",
-               values_to = "value") %>%
-  mutate(proportion = value/total)
-              
-eng_2018 %>%
-  arrange(-total)
-```
-
-```{r}
-eng_2017 <- energy_types %>%
-  select(-"2018", -"2016") %>%
-  rename(energy = "2017") %>%
-  filter(type != "Pumped hydro power") %>%
-  pivot_wider(id_cols = c(country, country_name, level),
-              names_from = type,
-              values_from = energy) %>%
-  mutate(total = `Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
-  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
-  pivot_longer(cols = -c(country,country_name,level,total),
-               names_to = "name",
-               values_to = "value") %>%
-  mutate(proportion = value/total)
-```
-
-```{r}
-eng_2016 <- energy_types %>%
-  select(-"2018", -"2017") %>%
-  rename(energy = "2016") %>%
-  filter(type != "Pumped hydro power") %>%
-  pivot_wider(id_cols = c(country, country_name, level),
-              names_from = type,
-              values_from = energy) %>%
-  mutate(total = `Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
-  mutate(`Conventional thermal` = -`Conventional thermal`) %>%
-  pivot_longer(cols = -c(country,country_name,level,total),
-               names_to = "name",
-               values_to = "value") %>%
-  mutate(proportion = value/total)
-```
-
-```{r}
-eng_2016 %>%
-  ggplot(aes(x = reorder(country, -total),
-             y = proportion,
-             fill = name)) +
-  geom_col() +
+  facet_wrap(~year) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r}
-eng_2017 %>%
-  ggplot(aes(x = reorder(country, -total),
-             y = proportion,
-             fill = name)) +
-  geom_col() +
-  theme(axis.text.x = element_text(angle = 90))
-```
-```{r}
-eng_2018
-```
+
+## How do energy imports vs exports compare between countries in Europe from 2016-2018?
 
 
-```{r}
-eng_2018 %>%
-  ggplot(aes(x = reorder(country, -total),
-             y = proportion,
-             fill = name)) +
-  geom_col() +
-  theme(axis.text.x = element_text(angle = 90))
-```
-```{r}
-tot_2016 <- energy_types %>%
- select(-"2018", -"2017") %>%
- rename(energy = "2016") %>%
- filter(type != "Pumped hydro power") %>%
- pivot_wider(id_cols = c(country, country_name, level),
-             names_from = type,
-             values_from = energy) %>%
- summarise(Year = 2016,
-           `Conventional thermal` = -sum(`Conventional thermal`),
-           Nuclear = sum(Nuclear),
-           Hydro = sum(Hydro),
-           Wind = sum(Wind),
-           Solar = sum(Solar),
-           Geothermal = sum(Geothermal),
-           Other = sum(Other))
-
-tot_2017 <- energy_types %>%
- select(-"2018", -"2016") %>%
- rename(energy = "2017") %>%
- filter(type != "Pumped hydro power") %>%
- pivot_wider(id_cols = c(country, country_name, level),
-             names_from = type,
-             values_from = energy) %>%
- summarise(Year = 2017,
-           `Conventional thermal` = -sum(`Conventional thermal`),
-           Nuclear = sum(Nuclear),
-           Hydro = sum(Hydro),
-           Wind = sum(Wind),
-           Solar = sum(Solar),
-           Geothermal = sum(Geothermal),
-           Other = sum(Other))
-
-
-tot_2018 <- energy_types %>%
- select(-"2017", -"2016") %>%
- rename(energy = "2018") %>%
- filter(type != "Pumped hydro power") %>%
- pivot_wider(id_cols = c(country, country_name, level),
-             names_from = type,
-             values_from = energy) %>%
- summarise(Year = 2018,
-           `Conventional thermal` = -sum(`Conventional thermal`),
-           Nuclear = sum(Nuclear),
-           Hydro = sum(Hydro),
-           Wind = sum(Wind),
-           Solar = sum(Solar),
-           Geothermal = sum(Geothermal),
-           Other = sum(Other))
-
-
-tot <- bind_rows(tot_2016,tot_2017,tot_2018) %>%
-  mutate(total = -`Conventional thermal` +Nuclear + Hydro + Wind + Solar + Geothermal + Other) %>%
-  pivot_longer(cols = -c(Year,total),
-               names_to = "name",
-               values_to = "value") %>%
-  mutate(proportion = value/total)
-tot
-```
-
-```{r}
-tot 
-```
-
-
-```{r}
-tot %>%
-  ggplot(aes(x = Year,
-             y = proportion,
-             fill = name)) +
-  geom_col()
-```
-```{r}
-tot %>%
-  ggplot(aes(x = Year,
-             y = value,
-             fill = name)) +
-  geom_col()
-```
-
-
-
-```{r}
-eng %>%
-  ggplot(aes(x = reorder(country, -total),
-             y = proportion,
-             fill = name,
-             width = total)) +
-  geom_col()
-```
+## How the contributions of the sources to the production of electricity
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
@@ -292,4 +215,5 @@ https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-cl
 https://ember-climate.org/wp-content/uploads/2018/01/EU-power-sector-report-2017.pdf
 
 
+https://ourworldindata.org/energy
 
