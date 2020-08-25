@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(tidytuesdayR)
 library(tidyverse)
 library(kableExtra)
+library(plotly)
 ```
 
 # Introduction and motivation
@@ -116,7 +117,7 @@ The data in the tidytuesday package only contains yearly totals from 2016-2018. 
 
 
 
-```{r}
+```{r energy_types_2018_plot,include=FALSE}
 energy_types %>%
   filter(year == 2018,
          type != "Pumped hydro power") %>%
@@ -137,8 +138,8 @@ energy_types %>%
 ```
 
 
-```{r}
-energy_types %>%
+```{r average_production_plot }
+average_production_plot <- energy_types %>%
   filter(type != "Pumped hydro power") %>%
   group_by(country_name,type) %>%
   summarise(average_energy = mean(energy)) %>%
@@ -155,20 +156,25 @@ energy_types %>%
              fill = `Energy Type`)) +
   geom_col() +
   theme(axis.text.x = element_text(angle = 90)) +
-  labs(title = "Average Renewable vs Non-Renewable Energy Production by Country from 2016-2018",
-         x = "")
+  labs(title = "Average Renewable vs Non-Renewable Energy Production from 2016-2018",
+       x = "",
+       y = "Energy in GWh(Gigawatt hours)")
+
+```
+```{r average_production_plotly}
+ggplotly(average_production_plot)
 ```
 
 
-```{r}
-energy_types %>%
+```{r yearly_production_plot}
+yearly_production_plot <- energy_types %>%
   filter(level != "Level 2") %>%
   group_by(type,year) %>%
   summarise(total = sum(energy)) %>%
   pivot_wider(id_cols = year,
               names_from = type,
               values_from = total) %>%
-  mutate(Total_Renewable = Geothermal + Hydro + Nuclear + Other + Solar + Wind) %>%
+  mutate(`Total Renewable` = Geothermal + Hydro + Nuclear + Other + Solar + Wind) %>%
   pivot_longer(cols = -year,
                names_to = "type",
                values_to = "total") %>%
@@ -177,40 +183,48 @@ energy_types %>%
              fill = type)) +
   geom_col() +
   facet_wrap(~year) +
-  theme(axis.text.x = element_text(angle = 90)) +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title.y = element_text(vjust=1)) +
   labs(title = "Total Energy Production by Type and Year",
-       x = "")
+       x = "",
+       y = "Total energy production in GWh (Gigawatt hours)")
+
+```
+
+
+
+```{r yearly_production_plotly}
+ggplotly(yearly_production_plot)
 ```
 
 
 ## How do energy imports vs exports compare between countries in Europe from 2016-2018?
 
-```{r}
-country_totals
-```
 
-```{r}
+
+```{r ,include=FALSE}
 country_totals %>%
-  group_by(country_name,type) %>%
-  summarise(average = mean(energy)) %>%
+  filter(year == "2018") %>%
+  select(country_name,type,energy) %>%
   pivot_wider(id_cols = country_name,
               names_from = type,
-              values_from = average) %>%
+              values_from = energy) %>%
   mutate(Imports = -Imports) %>%
-  pivot_longer(cols = -country_name,
+  select(country_name,Exports,Imports,`Total net production`) %>%
+  mutate(net_import_export = Exports + Imports) %>%
+  pivot_longer(cols = -c(country_name,`Total net production`, net_import_export),
                names_to = "Type",
                values_to = "Energy") %>%
-  filter(Type %in% c("Imports", "Exports")) %>%
-  ggplot(aes(x = country_name,
-             y = Energy,
-             fill = Type)) +
-  geom_col() +
+  ggplot(aes(x = reorder(country_name,-net_import_export))) +
+  geom_col(aes(y = Energy,
+               fill = Type)) +
+  geom_point(aes(y = net_import_export,
+                 size = `Total net production`)) +
   theme(axis.text.x = element_text(angle = 90))
-  
 ```
 
-```{r}
-country_totals %>%
+```{r export_import_plot}
+export_import_plot <- country_totals %>%
   group_by(country_name,type) %>%
   summarise(average = mean(energy)) %>%
   pivot_wider(id_cols = country_name,
@@ -225,39 +239,32 @@ country_totals %>%
   ggplot(aes(x = reorder(country_name,-net_import_export))) +
   geom_col(aes(y = Energy,
                fill = Type)) +
-  theme(axis.text.x = element_text(angle = 90))
+  geom_point(aes(y = net_import_export,
+                 size = `Total net production`)) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(x = "",
+       y = "Energy in GWh (Gigawatt hours)",
+       title = "Average Export and Imports by Country 2016-2018")
 ```
 
-```{r}
-country_totals %>%
-  group_by(country_name,type) %>%
-  summarise(average = mean(energy)) %>%
-  pivot_wider(id_cols = country_name,
-              names_from = type,
-              values_from = average) %>%
-  mutate(Imports = -Imports) %>%
-  select(country_name,Exports,Imports,`Total net production`) %>%
-  ungroup() %>%
-  summarise(Exports = sum(Exports),
-            Imports = sum(Imports),
-            `Total net production` = sum(`Total net production`))
+```{r export_import_plotly}
+ggplotly(export_import_plot)
 ```
-```{r}
+
+```{r net_export_kable}
 country_totals %>%
-  group_by(country_name,type) %>%
-  summarise(average = mean(energy)) %>%
-  pivot_wider(id_cols = country_name,
+  replace_na(list(energy = 0)) %>%
+  group_by(type,year) %>%
+  summarise(total = sum(energy)) %>%
+  pivot_wider(id_cols = year,
               names_from = type,
-              values_from = average) %>%
-  mutate(Imports = -Imports) %>%
-  select(country_name,Exports,Imports,`Total net production`) %>%
-  replace_na(list(Exports = 0)) %>%
-  ungroup() %>%
-  summarise(Exports = sum(Exports),
-            Imports = sum(Imports),
-            `Total net production` = sum(`Total net production`)) %>%
-  mutate(`Net Imports and Exports` = Exports + Imports )
+              values_from = total) %>%
+  mutate(`Net export-imports` = Exports - Imports) %>%
+  select(year, `Total net production`, `Energy supplied`, `Energy absorbed by pumping`, Exports, Imports, `Net export-imports`) %>%
+  kable() %>%
+  kable_styling()
 ```
+
 
 
 ## How the contributions of the sources to the production of electricity
