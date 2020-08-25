@@ -202,21 +202,31 @@ p <- contribute_to_europe %>%
     pivot_longer(cols=c(2:8),
                  names_to = "contribution",
                  values_to = "value")
- p %>%
-   plot_ly(labels = ~contribution,
-          values = ~value,
-          textposition = 'outside',
-          textinfo = 'label+percent') %>%
-   add_pie(data = filter(p, year==2016), name = "2016", domain = list(row = 0, column = 0)) %>%
-  add_pie(data = filter(p, year==2017), name = "2017", domain = list(row = 0, column = 2)) %>%
-  add_pie(data = filter(p, year==2018), name = "2018",domain = list(row = 0, column = 4)) %>%
-   layout(title = 'Energy source contribution to the total production in Europe (%) 2016,2017,2018',
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         showlegend = F,
-         grid=list(rows=1, columns=5))
 
+ a <- p %>%
+   mutate(contribution_fct = fct_reorder(contribution,value)) %>%
+  ggplot(aes(x=contribution_fct,
+         y=value,
+         fill=contribution)) +
+  geom_bar(stat="identity",
+           position = "dodge") +
+   geom_text(aes(label=value), position = "stack", hjust=-0.5, size=2.5) +
+   facet_wrap(~year) +
+  ggtitle("Energy source contribution to the total production in Europe")+
+    ylab("percentage") +
+    xlab("") +
+   scale_y_continuous(limits = c(0,100))+
+   coord_flip()+
+   theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size=7), 
+        axis.title.y = element_text(size=6),
+        axis.title.x = element_text(size=6),
+        plot.title = element_text(size = 10, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "bold"))
  
+ a
 ```
 
 ```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE}
@@ -229,10 +239,11 @@ df_tbl <-  df %>%
 df_tbl$contribution = factor(df_tbl$contribution, levels=c('hydro','wind','solar','nuclear','thermal','geothermal','other'))
   
 df_tbl %>%
-  ggplot(aes(x=country_name, y= value, fill= contribution)) +
+  mutate(country_fct = fct_reorder(country_name, value)) %>%
+  ggplot(aes(x=country_fct, y= value, fill= contribution)) +
   geom_col(position = "stack") +
   theme_minimal() +
-  facet_wrap(~contribution, ncol=7) +
+  facet_wrap(contribution ~., ncol=7) +
   coord_flip() +
   ggtitle("Energy source contribution to the total production in %",year)+
     ylab("percentage") +
