@@ -3,11 +3,12 @@ title: "ETC5521 Assignment 1"
 subtitle: "How sustainable is the energy production in Europe? "
 team: Koala
 author:
-  - Patu Saputra 
+  - Putu Saputra 
   - Vinny Vu
 date: "`r Sys.Date()`"
 output: 
-  html_document
+  bookdown::html_document2
+bibliography: references.bib  
 ---
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
@@ -18,7 +19,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r libraries, include = FALSE, message = FALSE, warning = FALSE}
 library(tidyverse)
+library(knitr)
+library(ggplot2)
 library(kableExtra)
+library(bookdown)
+library(plotly)
 ```
 
 # Introduction and motivation
@@ -56,7 +61,7 @@ country_totals <- country_totals %>%
 country_totals$year <- as.numeric(country_totals$year)
 ```
 
-The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
+The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union. @tidytuesday The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
 The variables in the `energy_types` table are included below:
 
 ```{r,include = FALSE}
@@ -95,7 +100,7 @@ tibble(variables_2,class_2,desc_2) %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
-The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information.  
+The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
 
 
 # Analysis and findings
@@ -116,7 +121,7 @@ return(total_year)
 
 country_total_2016 <- extract_total_net(2016)
 country_total_2017 <- extract_total_net(2017)
-country_total_2018 <-extract_total_net(2018)
+country_total_2018 <- extract_total_net(2018)
 
 extract_energy <- function(x){
 total_year <- energy_types %>% 
@@ -196,7 +201,9 @@ contribute_to_europe <- europe_energy_contribution(europe_total_energy,
                                                    europe_total_production)
 ```
 
-```{r piechart-europe, echo=FALSE, warning=FALSE, message=FALSE}
+To get the energy proportion, the method we use is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. The \@ref(fig:chart-europe) figure shows the percentage of the contribution of energy types to the total electricity production in Europe for three years of observation (2016,2017,2018). The graph produced using `plotly` package. @plotly From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the most massive supply, with nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the type of energy with the smallest contribution by not reaching 1%.
+
+```{r chart-europe, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in Europe"}
 library(plotly)
 p <- contribute_to_europe %>%
     pivot_longer(cols=c(2:8),
@@ -209,9 +216,11 @@ p <- contribute_to_europe %>%
          y=value,
          fill=contribution)) +
   geom_bar(stat="identity",
-           position = "dodge") +
-   geom_text(aes(label=value), position = "stack", hjust=-0.5, size=2.5) +
+           position = "dodge",
+           width = 1) +
+ #  geom_text(aes(label=value), position = "stack", hjust=-0.5, size=2.5) +
    facet_wrap(~year) +
+   
   ggtitle("Energy source contribution to the total production in Europe")+
     ylab("percentage") +
     xlab("") +
@@ -225,18 +234,21 @@ p <- contribute_to_europe %>%
         axis.title.x = element_text(size=6),
         plot.title = element_text(size = 10, face = "bold"),
         plot.subtitle = element_text(size = 9, face = "bold"))
- 
- a
+
+ggplotly(a, tooltip = c("fill","y"))
 ```
 
-```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE}
+Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-2016), Figure \@ref(fig:plot-contribution-country-2017), and Figure \@ref(fig:plot-contribution-country-2018). The figures show the proportion of energy types in European countries in 2016,2017, adn 2018 respectively. In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs in their country. However, it is interesting that Albania relies mostly on hydropower. The same is true in Norway, Luxembourg and Georgia.
+Meanwhile, Denmark is the country with the most significant wind power utilization, followed by Lithuania and Ireland. The energy intake in France and Slovakia is dominated by nuclear power. As for solar energy, many have adopted it, but the percentage is still small. Not many countries use geothermal, only Italy and Turkey.
+
+```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country"}
 create_plot <- function(df){
 year <- paste0(df$year[1])
 df_tbl <-  df %>%
     pivot_longer(cols=c(3:9),
                  names_to = "contribution",
                  values_to = "value") 
-df_tbl$contribution = factor(df_tbl$contribution, levels=c('hydro','wind','solar','nuclear','thermal','geothermal','other'))
+#df_tbl$contribution = factor(df_tbl$contribution, #levels=c('thermal','nuclear','hydro','wind','solar','geothermal','other'))
   
 df_tbl %>%
   mutate(country_fct = fct_reorder(country_name, value)) %>%
@@ -255,12 +267,19 @@ df_tbl %>%
         plot.title = element_text(size = 10, face = "bold"),
         plot.subtitle = element_text(size = 9, face = "bold"))
 }
+```
 
-create_plot(energy_contribution_2016)
-create_plot(energy_contribution_2017)
-create_plot(energy_contribution_2018)
+```{r plot-contribution-country-2016, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country in 2016"}
+ggplotly(create_plot(energy_contribution_2016))
+```
+
+```{r plot-contribution-country-2017, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country in 2017"}
+ggplotly(create_plot(energy_contribution_2017))
+```
+
+```{r plot-contribution-country-2018, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country in 2018"}
+ggplotly(create_plot(energy_contribution_2018))
 ```
 
 
 # References
-
