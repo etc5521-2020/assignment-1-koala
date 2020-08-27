@@ -6,8 +6,9 @@ author:
   - Patu Saputra 
   - Vinny Vu
 date: "`r Sys.Date()`"
-output: 
-  html_document
+output:
+ bookdown::html_document2
+keep_md: true
 ---
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
@@ -27,11 +28,11 @@ library(plotly)
 
 [FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
 
-In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (Peninsula Clean Energy, 2018.) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (NASA, 2007.) Not only does thermal power produced by fossil fuels emit green house gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
+In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," @peninsula_2018 These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” @twardy_greenhouse_2017 Not only does thermal power produced by fossil fuels emit green house gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
 
-Per Our World Data Europe is currently the 3rd highest consumer of primary energy behind Asia pacific and North America making up approximately 15% of the total World Energy Consumption (Our World Data, 2019).  
+Per Our World Data Europe is currently the 3rd highest consumer of primary energy behind Asia pacific and North America making up approximately 15% of the total World Energy Consumption @ritchie_energy_2014.  
 
-As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” (European Power sector, 2017) in favor cleaner, renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) assess how successful they currently are and answer the question:  
+As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” @energiewende_european_2018 in favor cleaner, renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) assess how successful they currently are and answer the question:  
 
 
 How sustainable is the energy production in Europe? 
@@ -114,7 +115,7 @@ The data in the tidytuesday package only contains yearly totals from 2016-2018. 
 
 ##  Which countries have the highest production of sustainable energy based on energy types? 
 
-To assess which countries lead in renewable energy production we have used the energy_types table to make a bar plot shown below. The bar plot shows the average production of renewable energy in the positive y-axis and average conventional thermal energy on the negative y-axis. The average across the 3 years was used as the individual plots for 2016-2018 did not show much variation due to the relatively short period of time. From the plot we can see France, Germany, Spain, Norway and Sweden lead Europe in the production of renewable energy, with France producing almost an average 500,000 GWh a year with Nuclear making up the majority of the renewable energy production. France also has a significantly small level of conventional thermal energy production compared to renewable energy. Although Germany is second leading producer of renewable energy they are also the leading European producer of conventional thermal energy producing almost 363,000 GWh of energy per year.   
+To assess which countries lead in renewable energy production we have used the energy_types table to make a bar plot in Figure \@ref(fig:average-production-plotly).  The bar plot shows the average production of renewable energy in the positive y-axis and average conventional thermal energy on the negative y-axis. The average across the 3 years was used as the individual plots for 2016-2018 did not show much variation due to the relatively short period of time. From the plot we can see France, Germany, Spain, Norway and Sweden lead Europe in the production of renewable energy, with France producing almost an average 500,000 GWh a year with Nuclear making up the majority of the renewable energy production. France also has a significantly small level of conventional thermal energy production compared to renewable energy. Although Germany is second leading producer of renewable energy they are also the leading European producer of conventional thermal energy producing almost 363,000 GWh of energy per year.   
 
 
 ```{r energy_types_2018_plot,include=FALSE}
@@ -161,7 +162,11 @@ average_production_plot <- energy_types %>%
        y = "Energy in GWh(Gigawatt hours)")
 
 ```
-```{r average_production_plotly}
+
+
+
+
+```{r average-production-plotly, fig.cap= "Average Renewable vs Non-Renewable Energy Production from 2016-2018" }
 ggplotly(average_production_plot)
 ```
 
@@ -191,18 +196,18 @@ yearly_production_plot <- energy_types %>%
 
 ```
 
-To look closer at European energy production across the 3 years the following plots shows the breakdown of the total production of each energy type for each year. For comparability between total renewable and non-renewable energy production a total renewable column is added. From the graph we can see the production of renewable energy exceeds the production thermal energy across all years. Notably nuclear energy leads the production of renewable energy with France being a leading producer.Conventional thermal energy still however contributes to just under 50% of energy production. From the first plot, although there are several countries with renewable energy greatly exceeding fossil fuels several countries such as Germany, United Kingdom, Italy and Turkey show high levels of conventional thermal energy production.   
+To look closer at European energy production across the 3 years the plot in \@ref(fig:yearly-production-plotly) shows the breakdown of the total production of each energy type for each year. For comparability between total renewable and non-renewable energy production a total renewable column is added. From the graph we can see the production of renewable energy exceeds the production thermal energy across all years. Notably nuclear energy leads the production of renewable energy with France being a leading producer.Conventional thermal energy still however contributes to just under 50% of energy production. From the first plot, although there are several countries with renewable energy greatly exceeding fossil fuels several countries such as Germany, United Kingdom, Italy and Turkey show high levels of conventional thermal energy production.   
 
-```{r yearly_production_plotly}
+```{r yearly-production-plotly, fig.cap= "Total Energy Production by Type and Year"}
 ggplotly(yearly_production_plot) #outputting yearly_production_plot as a plotly 
 ```
 
 
 ## How do energy imports vs exports compare between countries in Europe from 2016-2018?
 
-Per Our World Data Europe only makes up 15% of the total World Energy Consumption (Our World Data, 2019). Therefore, to assess the global impact of Europe's renewable energy production we are interested in assessing the energy imports and exports of each country. Using the country_totals we have created the plot below showing the average exports on the positive y-axis and imports on the negative y-axis for each country across 2016-2018. Further points were added to visualize the net export less imports with the size of the point representing the total net production. We have decided to use the average across 2016-2018 as there is not a significant change in energy exports and imports across the 3 years.
+Per Our World Data Europe only makes up 15% of the total World Energy Consumption @ritchie_energy_2014. Therefore, to assess the global impact of Europe's renewable energy production we are interested in assessing the energy imports and exports of each country. Using the country_totals we have created the plot in Figure \@ref(fig:export-import-plotly) showing the average exports on the positive y-axis and imports on the negative y-axis for each country across 2016-2018. Further points were added to visualize the net export less imports with the size of the point representing the total net production. We have decided to use the average across 2016-2018 as there is not a significant change in energy exports and imports across the 3 years.
 
-From the visualization we can see Germany, France, Sweden, Norway and Czechia are the leading 5 countries in net exports less imports. Furthermore from the first visualization these countries lead Europe in the production of renewable energy with Germany and France being Europe's largest total net producer of energy showing signs of not only the production of renewable energy for local use but net exportation of renewable energy also. Further, from the visualization we can see Italy, Finland, United, Kingdom, Hungry and Belgium lead in net imports (imports greater than exports) in Europe.
+From the visualization we can see Germany, France, Sweden, Norway and Czechia are the leading 5 countries in net exports less imports. Furthermore from the first visualization Figure \@ref(fig:average-production-plotly) these countries lead Europe in the production of renewable energy with Germany and France being Europe's largest total net producer of energy showing signs of not only the production of renewable energy for local use but net exportation of renewable energy also. Further, from the visualization we can see Italy, Finland, United, Kingdom, Hungry and Belgium lead in net imports (imports greater than exports) in Europe.
 
 
 
@@ -254,15 +259,15 @@ export_import_plot <- country_totals %>%
        title = "Average Export and Imports by Country 2016-2018")
 ```
 
-```{r export_import_plotly}
+```{r export-import-plotly, fig.cap= "Average Export and Imports by Country 2016-2018"}
 ggplotly(export_import_plot)
 ```
 
-To look at Europe's net export-imports as a whole the table below shows summary of the total energy production levels across each year. From the table in 2016 and 2017 Europe is at a net export but in 2018 they are at a net import. This drop in 2018 is due to the spike in imports and drop in export in 2018. It should be noted there is a drop in total net production in 2018 suggesting reduced energy consumption supporting reduction of consumption of fossil fuels.    
+To look at Europe's net export-imports as a whole the Total \@ref(tab:net-export-kable) shows summary of the total energy production levels across each year. From the table in 2016 and 2017 Europe is at a net export but in 2018 they are at a net import. This drop in 2018 is due to the spike in imports and drop in export in 2018. It should be noted there is a drop in total net production in 2018 suggesting reduced energy consumption supporting reduction of consumption of fossil fuels.    
 
 
 
-```{r net_export_kable}
+```{r net-export-kable, fig.cap= "European Energy Production Summary 2016-2018"}
 country_totals %>%
   replace_na(list(energy = 0)) %>% # replacing NA values with o 
   group_by(type,year) %>%
@@ -272,7 +277,7 @@ country_totals %>%
               values_from = total) %>% # making energy types into columns
   mutate(`Net export-imports` = Exports - Imports) %>% # calculating net exports-imports 
   select(year, `Total net production`, `Energy supplied`, `Energy absorbed by pumping`, Exports, Imports, `Net export-imports`) %>% #reordering the columns 
-  kable() %>%
+  kable(caption = "European Energy Production Summary 2016-2018") %>%
   kable_styling()
 ```
 
