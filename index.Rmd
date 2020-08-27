@@ -3,11 +3,12 @@ title: "ETC5521 Assignment 1"
 subtitle: "How sustainable is the energy production in Europe? "
 team: Koala
 author:
-  - Patu Saputra 
+  - Putu Saputra 
   - Vinny Vu
 date: "`r Sys.Date()`"
 output: 
-  html_document
+  bookdown::html_document2
+bibliography: references.bib  
 ---
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
@@ -18,7 +19,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r libraries, include = FALSE, message = FALSE, warning = FALSE}
 library(tidyverse)
+library(knitr)
+library(ggplot2)
 library(kableExtra)
+library(bookdown)
+library(plotly)
 ```
 
 # Introduction and motivation
@@ -41,14 +46,16 @@ How sustainable is the energy production in Europe?
 energy_types <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
 country_totals <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
 
-energy_types <- energy_types %>% 
+energy_types <- energy_types %>%
   replace_na(list(country_name = "United Kingdom")) %>%
     pivot_longer(cols = starts_with("20"),
                names_to = "year",
                values_to = "energy")
 energy_types$year <- as.numeric(energy_types$year)
 
-country_totals <- country_totals %>%
+
+
+country_totals <- country_totals %>% 
   replace_na(list(country_name = "United Kingdom")) %>%
   pivot_longer(cols = starts_with("20"),
                names_to = "year",
@@ -58,7 +65,7 @@ country_totals$year <- as.numeric(country_totals$year)
 
 ```
 
-The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
+The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union. @tidytuesday The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
 The variables in the `energy_types` table are included below:
 
 ```{r,include = FALSE}
@@ -97,13 +104,212 @@ tibble(variables_2,class_2,desc_2) %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
-The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information.  
+The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
 
 
 # Analysis and findings
 
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
+
+## Energy types contribution to total energy production for each country in Europe
+
+```{r contribution-tbl-country, include=FALSE, warning=FALSE, message=FALSE}
+extract_total_net <- function(x){
+total_year <- country_totals %>% 
+  filter(type=="Total net production", year==x) %>%
+  select(-type,-country) %>%
+  pivot_wider(names_from = "level", values_from ="energy")
+return(total_year)
+}
+
+country_total_2016 <- extract_total_net(2016)
+country_total_2017 <- extract_total_net(2017)
+country_total_2018 <- extract_total_net(2018)
+
+extract_energy <- function(x){
+total_year <- energy_types %>% 
+  filter(year==x, level == "Level 1") %>%
+  select(-country) %>%
+  pivot_wider(names_from = "type", values_from ="energy")
+return(total_year)
+}
+
+en_types_2016 <- extract_energy(2016)
+en_types_2017 <- extract_energy(2017)
+en_types_2018 <- extract_energy(2018)
+```
+
+```{r, country-in-3y, include=FALSE}
+country_total_3y <- country_total_2016 %>%
+                      left_join(country_total_2017, by=c("country_name")) %>%
+                      left_join(country_total_2018, by=c("country_name")) %>%
+                    mutate(Total_3y = Total.x+Total.y+Total) %>%
+                    select(country_name,Total_3y)
+
+en_types_3y <- en_types_2016 %>%
+                      left_join(en_types_2017, by=c("country_name")) %>%
+                      left_join(en_types_2018, by=c("country_name")) %>%
+                    mutate(Thermal_3y= `Conventional thermal.x`+`Conventional thermal.y` + `Conventional thermal`,
+                           Nuclear_3y = Nuclear.x + Nuclear.y + Nuclear,
+                           Hydro_3y = Hydro + Hydro.x+ Hydro.y,
+                           Wind_3y = Wind.x + Wind.y + Wind,
+                           Solar_3y = Solar.x + Solar.y + Solar,
+                           Geothermal_3y = Geothermal.x + Geothermal.y + Geothermal,
+                           Other_3y = Other.x+Other.y+Other) %>%
+                    select(country_name, Thermal_3y,Nuclear_3y, Hydro_3y, Wind_3y, Solar_3y, Geothermal_3y, Other_3y)
+
+
+en_contribution_3y <- en_types_3y %>%
+  inner_join(country_total_3y, by="country_name") %>%
+  mutate(thermal = round(Thermal_3y/Total_3y*100, digits = 2),
+         nuclear = round(Nuclear_3y/Total_3y*100, digits = 2),
+         hydro = round(Hydro_3y/Total_3y*100, digits = 2),
+         wind = round(Wind_3y/Total_3y*100, digits = 2),
+         solar = round(Solar_3y/Total_3y*100, digits = 2),
+         geothermal = round(Geothermal_3y/Total_3y*100, digits = 2),
+         other = round(Other_3y/Total_3y*100, digits = 2)) %>%
+    select(-c(Thermal_3y, Nuclear_3y, Hydro_3y, Wind_3y, Solar_3y, Geothermal_3y,Other_3y, Total_3y)) 
+```
+
+
+```{r tbl-contribution-europe, include=FALSE, warning=FALSE, message=FALSE}
+get_total <- function(df1,df2,df3){
+  df1 <- df1 %>%
+  summarise(year=min(year), Total = sum(Total))
+  df2 <- df2 %>%
+  summarise(year=min(year), Total = sum(Total))
+  df3 <- df3 %>%
+  summarise(year=min(year),Total = sum(Total))
+ rbind(df1,df2,df3) 
+}
+
+europe_total_production <- get_total(country_total_2016,country_total_2017,country_total_2018)
+
+europe_energy_cont <- function(df){
+  df %>%
+  summarise(year = min(year),
+            Geothermal = sum(Geothermal),
+            Nuclear = sum(Nuclear),
+            Hydro = sum(Hydro),
+            Wind = sum(Wind),
+            Solar = sum(Solar),
+            `Conventional thermal` = sum(`Conventional thermal`),
+            Other = sum(Other))
+}
+
+europe_total_energy <- rbind(europe_energy_cont(en_types_2016),
+                           europe_energy_cont(en_types_2017),
+                           europe_energy_cont(en_types_2018))
+
+europe_energy_contribution <- function(df1,df2){
+df1 %>%
+  left_join(df2, by="year") %>%
+  mutate(Thermal = round(`Conventional thermal`/Total*100, digits = 2),
+         Nuclear = round(Nuclear/Total*100, digits = 2),
+         Hydro = round(Hydro/Total*100, digits = 2),
+         Wind = round(Wind/Total*100, digits = 2),
+         Solar = round(Solar/Total*100, digits = 2),
+         Geothermal = round(Geothermal/Total*100, digits = 2),
+         Other = round(Other/Total*100, digits = 2)) %>%
+    select(-c(`Conventional thermal`, Total)) 
+}
+
+contribute_to_europe <- europe_energy_contribution(europe_total_energy,
+                                                   europe_total_production)
+```
+
+To get the energy proportion, the method we use is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. The \@ref(fig:chart-europe) figure shows the percentage of the contribution of energy types to the total electricity production in Europe for three years of observation (2016,2017,2018). The graph produced using `plotly` package. @plotly From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the most massive supply, with nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the type of energy with the smallest contribution by not reaching 1%.
+
+```{r chart-europe, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in Europe"}
+library(plotly)
+p <- contribute_to_europe %>%
+    pivot_longer(cols=c(2:8),
+                 names_to = "contribution",
+                 values_to = "value")
+
+ a <- p %>%
+   mutate(contribution_fct = fct_reorder(contribution,value)) %>%
+  ggplot(aes(x=contribution_fct,
+         y=value,
+         fill=contribution)) +
+  geom_bar(stat="identity",
+           position = "dodge",
+           width = 1) +
+ #  geom_text(aes(label=value), position = "stack", hjust=-0.5, size=2.5) +
+   facet_wrap(~year) +
+   
+  ggtitle("Energy source contribution to the total production in Europe")+
+    ylab("percentage") +
+    xlab("") +
+   scale_y_continuous(limits = c(0,100))+
+   coord_flip()+
+   theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size=7), 
+        axis.title.y = element_text(size=6),
+        axis.title.x = element_text(size=6),
+        plot.title = element_text(size = 10, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "bold"))
+
+ggplotly(a, tooltip = c("fill","y"))
+```
+
+Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-3y) In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs in their country. However, it is interesting that Albania relies almost mostly on hydropower. The same situation occurs in Norway and Georgia which rely on hydro over than 80%.
+Meanwhile, The energy intake in France, Slovakia, and Hungary are dominated by nuclear power. France which has 58 nuclear power reactors is the highest country with almost 71% nuclear contribution for its country. @iaea_country While Slovakia and Hungary more than 50% nuclear energy contribution. Denmark is the country with the most significant wind power utilization with nearly 48%, followed by Lithuania and Ireland. As for solar energy, many have adopted it, but the percentage is still small. Italy utilise solar about 8% and Greece around 7.7%. Not many countries use geothermal, only Italy and Turkey with around 2% percentage.
+
+```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country"}
+create_plot <- function(df){
+df_tbl <-  df %>%
+    pivot_longer(cols=c(2:8),
+                 names_to = "contribution",
+                 values_to = "value") 
+#df_tbl$contribution = factor(df_tbl$contribution, #levels=c('thermal','nuclear','hydro','wind','solar','geothermal','other'))
+  
+df_tbl %>%
+  mutate(country_fct = fct_reorder(country_name, value)) %>%
+  ggplot(aes(x=country_fct, y= value, fill= contribution)) +
+  geom_col(position = "stack") +
+  theme_minimal() +
+  #facet_wrap(contribution ~., ncol=7) +
+  coord_flip() +
+  ggtitle("Energy source contribution to the total production in 2016-2018")+
+    ylab("percentage") +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size=7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size=6),
+        plot.title = element_text(size = 10, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "bold"))
+}
+```
+
+```{r plot-contribution-country-3y, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country in 3 years"}
+ggplotly(create_plot(en_contribution_3y))
+```
+
+The interesting part if we look at Malta, who did not get a full production of energy. After we check the dataset, found out that the total amount of net production is not equal by sum of energy types production in observation year. As seen in Table \@ref(tab:tbl-malta), Malta did not list any energy type in 2018 except Conventional Thermal. So that there is an insufficient value when we calculate the contributions.
+
+```{r tbl-malta, echo=FALSE}
+malta <- rbind(country_total_2016,
+      country_total_2017,
+      country_total_2018) %>%
+  filter(country_name=="Malta") %>%
+  select(-year, -country_name)
+
+malta_en <- rbind(en_types_2016,
+      en_types_2017,
+      en_types_2018) %>%
+  filter(country_name=="Malta") %>%
+  select(-level)
+
+cbind(malta_en,malta) %>%
+  kable(caption = "Energy type of Malta in 2016-2018") %>%
+  kable_styling("hover")
+```
 
 
 # References
