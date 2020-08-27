@@ -287,15 +287,12 @@ country_totals %>%
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
+# Conclusion 
+
+From our analysis we can see France, Germany, Spain, Norway and Sweden are some of the countries that lead the European production of renewable energy with nuclear being the most prominent renewable energy produced. Across all three years the total renewable energy produced exceeds the total conventional thermal energy produced with 2018 being the highest year. However, although this shows positive signs in the movement towards renewable energy, conventional thermal energy still dominates production in many European countries such as Germany and the United Kingdom making just under half the total energy production across Europe across all three years. 
+
+When assessing the exports to imports of energy across Europe we can see France and Germany lead in next exports also being the leading countries in renewable energy production. However, when assessing year to year we can see 2018 showed a net importation of energy compared to the net exportation in 2016 and 2017.   
+
+
 # References
-https://github.com/etc5521-2020/assignment-1-koala/blob/master/index.Rmd
-
-https://svs.gsfc.nasa.gov/20114#:~:text=The%20'greenhouse%20effect'%20is%20the,radiating%20from%20Earth%20toward%20space.&text=The%20gases%20that%20contribute%20to,%2C%20and%20chlorofluorocarbons%20(CFCs).
-
-https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-clean-and-renewable-energy/
-
-https://ember-climate.org/wp-content/uploads/2018/01/EU-power-sector-report-2017.pdf
-
-
-https://ourworldindata.org/energy
 
