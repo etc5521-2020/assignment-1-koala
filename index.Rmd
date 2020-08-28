@@ -171,7 +171,7 @@ yearly_production_plot <- energy_types %>%
 
 ```
 
-To look closer at European energy production across the 3 years the plot in \@ref(fig:yearly-production-plotly) shows the breakdown of the total production of each energy type for each year. For comparability between total renewable and non-renewable energy production a total renewable column is added. From the graph we can see the production of renewable energy exceeds the production thermal energy across all years. Notably nuclear energy leads the production of renewable energy with France being a leading producer.Conventional thermal energy still however contributes to just under 50% of energy production. From the first plot, although there are several countries with renewable energy greatly exceeding fossil fuels several countries such as Germany, United Kingdom, Italy and Turkey show high levels of conventional thermal energy production.   
+To look closer at European energy production across the 3 years the plot in \@ref(fig:yearly-production-plotly) shows the breakdown of the total production of each energy type for each year. For comparability between total renewable and non-renewable energy production a total renewable column is added. From the graph we can see the production of renewable energy exceeds the production thermal energy across all years. Notably nuclear energy leads the production of renewable energy with France being a leading producer. Conventional thermal energy still however contributes to just under 50% of energy production. From \@ref(fig:average-production-plotly), although there are several countries with renewable energy greatly exceeding fossil fuels several countries such as Germany, United Kingdom, Italy and Turkey show high levels of conventional thermal energy production.   
 
 
 ```{r yearly-production-plotly, fig.cap= "Total Energy Production by Type and Year"}
@@ -219,7 +219,7 @@ export_import_plot
 
 
 
-To look at Europe's net export-imports as a whole the Total \@ref(tab:net-export-kable) shows summary of the total energy production levels across each year. From the table in 2016 and 2017 Europe is at a net export but in 2018 they are at a net import. This drop in 2018 is due to the spike in imports and drop in export in 2018. It should be noted there is a drop in total net production in 2018 suggesting reduced energy consumption supporting reduction of consumption of fossil fuels.    
+To look at Europe's net export-imports as a whole Table \@ref(tab:net-export-kable) shows summary of the total energy production levels across each year. From the table in 2016 and 2017 Europe is at a net export but in 2018 they are at a net import. This drop in 2018 is due to the spike in imports and drop in export in 2018. It should be noted there is a drop in total net production in 2018 suggesting reduced energy consumption supporting reduction of consumption of fossil fuels.    
 
 
 
