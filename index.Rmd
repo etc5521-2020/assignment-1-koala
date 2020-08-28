@@ -29,7 +29,7 @@ library(plotly)
 
 # Introduction and motivation
 
-In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," @peninsula_2018 These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” @twardy_greenhouse_2017 Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
+In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," @peninsula_2018 These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” @twardy_greenhouse_2007 Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
 
 Per Our World Data Europe is currently the 3rd highest consumer of primary energy behind Asia pacific and North America making up approximately 15% of the total World Energy Consumption @ritchie_energy_2014.  
 
@@ -42,7 +42,7 @@ Specifically:
 
 1. Which countries have the highest production of sustainable energy based on energy types? 
 2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
-3. How the contributions of the sources to the production of electricity
+3. How the contributions of the sources to the production of electricity?
 
 
 # Data description
@@ -66,11 +66,9 @@ country_totals <- country_totals %>%
 country_totals$year <- as.numeric(country_totals$year)
 ```
 
-
-
 The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
 
-The variables in the `energy_types` table are included below:
+The variables in the `energy_types` table are included below in Table \@ref(tab:energy-tab-vr):
 
 ```{r,include = FALSE}
 variables_1 <- energy_types %>% names()
@@ -83,13 +81,13 @@ desc_1 <- c("Country ID",
            "Energy in GWh (Gigawatt hours)")
 ```
 
-```{r, echo=FALSE}
+```{r energy-tab-vr, echo=FALSE}
 tibble(variables_1,class_1,desc_1) %>%
-  kable(col.names = c("variable","class","description")) %>%
+  kable(col.names = c("variable","class","description"), caption ="Energy types variables") %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
-The variables in the `country_totals` table are included below: 
+The variables in the `country_totals` table are included below in Table \@ref(tab:country-tab-vr): 
 
 ```{r, include = FALSE}
 variables_2 <- country_totals %>% names()
@@ -102,19 +100,16 @@ desc_2 <- c("Country ID",
            "Energy in GWh (Gigawatt hours)")
 ```
 
-```{r, echo=FALSE}
+```{r country-tab-vr, echo=FALSE}
 tibble(variables_2,class_2,desc_2) %>%
-  kable(col.names = c("variable","class","description")) %>%
+  kable(col.names = c("variable","class","description"), caption ="Country total variables") %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
-The data in the tidytuesday package only contains yearly totals from 2016-2018. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
+The data in the tidytuesday package only contains yearly totals from 2016-2018. @tidytuesday However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
 
 
 # Analysis and findings
-
-
-
 
 ##  Which countries have the highest production of sustainable energy based on energy types? 
 
@@ -195,7 +190,7 @@ From the visualization we can see Germany, France, Sweden, Norway and Czechia ar
 
 
 
-```{r export_import_plot, fig.cap= "Average Export and Imports by Country 2016-2018"}
+```{r export-import-plot, fig.cap= "Average Export and Imports by Country 2016-2018"}
 export_import_plot <- country_totals %>%
   replace_na(list(energy = 0)) %>% #replacing NA values with 0 
   group_by(country_name,type) %>%
@@ -446,6 +441,8 @@ cbind(malta_en,malta) %>%
 From our analysis we can see France, Germany, Spain, Norway and Sweden are some of the countries that lead the European production of renewable energy with nuclear being the most prominent renewable energy produced. Across all three years the total renewable energy produced exceeds the total conventional thermal energy produced with 2018 being the highest year. However, although this shows positive signs in the movement towards renewable energy, conventional thermal energy still dominates production in many European countries such as Germany and the United Kingdom making just under half the total energy production across Europe across all three years. 
 
 When assessing the exports to imports of energy across Europe we can see France and Germany lead in next exports also being the leading countries in renewable energy production. However, when assessing year to year we can see 2018 showed a net importation of energy compared to the net exportation in 2016 and 2017. 
+
+The energy type contribution of each country is still dominated by conventional thermal. Although some countries supply electricity in their country with renewable energy like Albania with hydro and wind power from Denmark. Solar provides a small percentage of energy supply, but several countries have implemented it.
 
 # References
 
