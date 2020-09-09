@@ -4,8 +4,8 @@ Team name: Koala
 
 Team members:
 
-* Vinny Vu
-* Putu Saputra
+* Varsha Ujjinni VijayKumar
+* Justin Thomas
 
 # Steps
 
