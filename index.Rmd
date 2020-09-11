@@ -44,6 +44,12 @@ Specifically:
 2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
 3. How the contributions of the sources to the production of electricity?
 
+Additional Questions for Assignment 2 :
+
+1. What is the difference in energy produced between hydro power and pumped hydro power?
+2. How efficient is it produce electricity using pumped hydro power?
+3. What has the trend been like for EU countries to achieve their 2020 renewable energy target?
+
 
 # Data description
 
