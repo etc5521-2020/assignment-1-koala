@@ -174,24 +174,21 @@ euro_table$Year <- year(euro_table$Year)
 ```
 
 ```{r target-plot}
-target <- ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018))) +
-  geom_line(aes(x=Year, y=Percentage, color=Country)) +
-  geom_point(aes(x=Year, y=Percentage, color=Country), data = euro_table %>% filter(Year == 2020)) +
-  theme(legend.position = "none") +
+target <- 
+ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) +
+  geom_line() +
+  geom_point(data = euro_table %>% filter(Year == 2020)) +
+  #geom_text(x = 2020, y = 43, label = "2020 Target", size = 3) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) +
+  scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) +
+  theme(axis.text.x = element_text(angle = 90)) +
   ylab("Share of energy consumed that is renewable energy (%)") +
   ggtitle("Percentage of renewable energy consumed from 2010 - 2018") +
   facet_wrap(~Country)
 
 ggplotly(target)
-```
-```{r, eval=FALSE}
-install.packages("babynames")
-library(babynames)
-don <- babynames %>% 
-  filter(name %in% c("Ashley", "Patricia", "Helen")) %>%
-  filter(sex=="F")
-ggplot(don, aes(x=year, y=n, group=name, color=name)) +
-    geom_line()
 ```
 
 # Analysis and findings
