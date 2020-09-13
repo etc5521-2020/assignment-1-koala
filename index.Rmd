@@ -26,6 +26,7 @@ library(kableExtra)
 library(bookdown)
 library(plotly)
 library(readr)
+library(readxl)
 ```
 
 # Introduction and motivation
@@ -114,8 +115,61 @@ tibble(variables_2,class_2,desc_2) %>%
 
 The data in the tidytuesday package only contains yearly totals from 2016-2018. @tidytuesday However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
 
-```{r}
+```{r target-energy}
 target_energy <- read_tsv("data/t2020_31.tsv")
+write.csv(target_energy, 'target_energy.csv')
+target_energy <- read_csv("data/target_energy.csv")
+```
+
+```{r tidying-data}
+target_energy <- target_energy[c(-12,-13,-14), 2:18]
+target_energy <- as_tibble(target_energy)
+#target_energy <- target_energy %>% rename(Country = "unit,indic_eu,geo\time") 
+```
+
+```{r}
+euro_table <- read_xls("data/euro_table.xls")
+euro_table <- euro_table %>% rename(Country = `Share of renewable energy in gross final energy consumption`,
+                      `2004` = ...2,
+                      `2005` = ...3,
+                      `2006` = ...4,
+                      `2007` = ...5,
+                      `2008` = ...6,
+                      `2009` = ...7,
+                      `2010` = ...8,
+                      `2011` = ...9,
+                      `2012` = ...10,
+                      `2013` = ...11,
+                      `2014` = ...12,
+                      `2015` = ...13,
+                      `2016` = ...14,
+                      `2017` = ...15,
+                      `2018` = ...16,
+                      TARGET = ...17)
+euro_table <- euro_table[c((-1:-5),(-43:-50)),]
+euro_table[37,1] <- "Kosovo"
+euro_table <- euro_table[-31,] #excluding switzerland because there are no values.
+euro_table$`2004` <- as.numeric(euro_table$`2004`)
+euro_table$`2005` <- as.numeric(euro_table$`2005`)
+euro_table$`2006` <- as.numeric(euro_table$`2006`)
+euro_table$`2007` <- as.numeric(euro_table$`2007`)
+euro_table$`2008` <- as.numeric(euro_table$`2008`)
+euro_table$`2009` <- as.numeric(euro_table$`2009`)
+euro_table$`2010` <- as.numeric(euro_table$`2010`)
+euro_table$`2011` <- as.numeric(euro_table$`2011`)
+euro_table$`2012` <- as.numeric(euro_table$`2012`)
+euro_table$`2013` <- as.numeric(euro_table$`2013`)
+euro_table$`2014` <- as.numeric(euro_table$`2014`)
+euro_table$`2015` <- as.numeric(euro_table$`2015`)
+euro_table$`2016` <- as.numeric(euro_table$`2016`)
+euro_table$`2017` <- as.numeric(euro_table$`2017`)
+euro_table$`2018` <- as.numeric(euro_table$`2018`)
+euro_table$TARGET <- as.numeric(euro_table$TARGET)
+```
+
+```{r}
+euro_table %>% ggplot(aes(y = Country)) +
+              geom_line(aes(x = `2004`))
 ```
 
 # Analysis and findings
