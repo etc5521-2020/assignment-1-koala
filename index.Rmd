@@ -1,10 +1,10 @@
 ---
-title: "ETC5521 Assignment 1"
+title: "ETC5521 Assignment 2"
 subtitle: "How sustainable is the energy production in Europe? "
 team: Koala
 author:
-  - Putu Saputra 
-  - Vinny Vu
+  - Varsha Ujjinni VijayKumar
+  - Justin Thomas
 date: "`r Sys.Date()`"
 output: 
   bookdown::html_document2
@@ -25,6 +25,7 @@ library(ggplot2)
 library(kableExtra)
 library(bookdown)
 library(plotly)
+library(readr)
 ```
 
 # Introduction and motivation
@@ -40,8 +41,7 @@ How sustainable is the energy production in Europe?
 
 Specifically:
 
-1. Which countries have the highest production of sustainable energy based on energy types? 
-2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
+1. Which countries have the highest production of sustainable energy based on energy types? 2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
 3. How the contributions of the sources to the production of electricity?
 
 Additional Questions for Assignment 2 :
@@ -114,6 +114,9 @@ tibble(variables_2,class_2,desc_2) %>%
 
 The data in the tidytuesday package only contains yearly totals from 2016-2018. @tidytuesday However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
 
+```{r}
+target_energy <- read_tsv("data/t2020_31.tsv")
+```
 
 # Analysis and findings
 
