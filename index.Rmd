@@ -115,6 +115,15 @@ tibble(variables_2,class_2,desc_2) %>%
 
 The data in the tidytuesday package only contains yearly totals from 2016-2018. @tidytuesday However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
 
+
+```{r check-missing,message=FALSE,warning=FALSE}
+library(naniar)
+#vis_miss finds the missing values in the dataset and produces a plot for depicting the % of NA's in the dataset
+#m1 <- vis_miss(energy_types) 
+m2 <- vis_miss(country_totals)
+gridExtra::grid.arrange(m1,m2,ncol = 3)
+```
+
 ```{r target-energy, eval=FALSE}
 target_energy <- read_tsv("data/t2020_31.tsv")
 write.csv(target_energy, 'target_energy.csv')
