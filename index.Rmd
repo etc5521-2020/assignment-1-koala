@@ -530,7 +530,7 @@ cbind(malta_en,malta) %>%
 
 ```{r cmp,message=FALSE,warning=FALSE} 
 # removing the level column for our analysis
-prod <- energy_types %>% select(-level)%>%  
+prod <- energy_types %>% select(-level) %>% 
   #filtering the energy types to be hydro and pumped hydro for comparison
   dplyr::filter(type %in% c("Hydro" ,"Pumped hydro power"))
 
@@ -544,7 +544,7 @@ electricity_prod <- prod %>%
   #arranging the  new column diff by descending order to remove the 0.00 values in the plot
   arrange(desc(diff)) %>% 
   #taking into account the first 40 values for plot
-  head(50)
+  head(40)
 
 #plotting a bar graph with x-axis country names and y-axis as the difference value 
 p1 <- ggplot(electricity_prod,aes(x = reorder(country_name,-diff), y = diff, fill = year)) + 
@@ -563,18 +563,18 @@ p1 <- ggplot(electricity_prod,aes(x = reorder(country_name,-diff), y = diff, fil
 #adding ggplotly interaction to the above graph
 diff_plotly <- ggplotly(p1)
   
-# #creating another dataframe with just the energy type hydro for comparison
-# hydro_pro <- energy_types %>% filter(type == "Hydro") %>%
-#   #grouping by the country names and the year
-#   group_by(country_name,type,year) %>%
-#   #calculating the average values of hydro energy for every year within each country
-#   summarise(avg_energy = mean(energy)) %>%
-#   #arranging the avg_energy by descending order to remove the 0.00 values in the plot
-#   arrange(desc(avg_energy)) %>%
-#   head(50)
+#creating another dataframe with just the energy type hydro for comparison
+hydro_pro <- energy_types %>% filter(type == "Hydro") %>% 
+  #grouping by the country names and the year
+  group_by(country_name,type,year) %>%
+  #calculating the average values of hydro energy for every year within each country
+  summarise(avg_energy = mean(energy)) %>% 
+  #arranging the avg_energy by descending order to remove the 0.00 values in the plot
+  arrange(desc(avg_energy)) %>% 
+  head(50)
 
 #plotting a bar graph for x-axis country names and y-axis with average energies 
-p2 <- ggplot(electricity_prod,aes(x = reorder(country_name,-`Pumped hydro power`), y = `Pumped hydro power`, fill = year)) + 
+p2 <- ggplot(hydro_pro,aes(x = reorder(country_name,-avg_energy), y = avg_energy, fill = year)) + 
   geom_col() +
   theme(axis.text.x = element_text(angle = 90),legend.position = "none") +
   xlab("country name") + 
@@ -584,9 +584,12 @@ p2 <- ggplot(electricity_prod,aes(x = reorder(country_name,-`Pumped hydro power`
 hydro_plotly <- ggplotly(p2)
 
 #arranging the two ggplotly plots into one plot using the subplot() from the plotly package
-subplot(diff_plotly,hydro_plotly,margin = 0.23,titleY = TRUE, titleX = TRUE) %>% 
-  layout(title = "Hydro power                        vs                    Pumped Hydro power") 
-
+subplot(diff_plotly,hydro_plotly,margin = 0.10,titleX = TRUE,titleY = TRUE) %>% 
+  #adding the titles and the axis labels to the subplot object
+  layout(title = "Difference in electricity produced by pumped hydro and hydro power", 
+         xaxis = list(title = "Electricity produced by pumped hydro power"),
+         xaxis4 = list(title = "Electricity produced by hydro power"),
+         yaxis = list(title = "Country"))
 ```
 
 ```{r pumped-power,message=FALSE,warning=FALSE}
@@ -627,14 +630,6 @@ binded_hydro <- cbind(hydro,pumped_abs, by.x = "country_name", by.y = "country_f
   #filtering the column Diff_prod to leave out country names with a diff value = 0.00
   filter(Diff_prod != 0.00)
 
-a <- list(
-  title = "Country"
-)
-
-b <- list(
-  title = "Difference in electricity produced and absorbed"
-)
-
 
 #plotting the above binded dataframe on a bar graph 
 prod_plot_16 <- ggplot(binded_hydro %>% filter(year == 2016),
@@ -644,11 +639,6 @@ prod_plot_16 <- ggplot(binded_hydro %>% filter(year == 2016),
   # facet_wrap(~ year) + 
   theme(axis.text.x = element_text(angle = 90),
         legend.position = "none") +
-  #layout(xaxis = b,yaxis = a)  +
-  # xlab(a) +
-  # ylab(b)+
-  #giving a title to the graph 
-  # ggtitle("Electricity produced by Pumped Hydro vs Spent on Pumped Hydro")+
   coord_flip()
 
 #adding the plot into the ggplotly function for interaction 
@@ -658,12 +648,8 @@ prod_plot_17 <- ggplot(binded_hydro %>% filter(year == 2017),
        aes(x = reorder(country_name, - Diff_prod), 
            y = Diff_prod, fill = year)) + 
   geom_col() +
-  xlab(a)+
-  # facet_wrap(~ year) + 
   theme(axis.text.x = element_text(angle = 90),
         legend.position = "none") +
-  #giving a title to the graph 
-  # ggtitle("Electricity produced by Pumped Hydro vs Spent on Pumped Hydro")+
   coord_flip()
 
 #adding the plot into the ggplotly function for interaction 
@@ -673,18 +659,23 @@ prod_plot_18 <- ggplot(binded_hydro %>% filter(year == 2018),
        aes(x = reorder(country_name, - Diff_prod), 
            y = Diff_prod, fill = year)) + 
   geom_col() +
-  xlab(a) +
-  # facet_wrap(~ year) + 
   theme(axis.text.x = element_text(angle = 90),
         legend.position = "none") +
-  #giving a title to the graph 
-  # ggtitle("Electricity produced by Pumped Hydro vs Spent on Pumped Hydro")+
   coord_flip()
 
 #adding the plot into the ggplotly function for interaction 
 p5 <- ggplotly(prod_plot_18)
-#gridExtra::grid.arrange(p3,p4,p5)
-subplot(p3,p4,p5,margin = 0.05,titleY = TRUE,titleX = TRUE) %>% layout(title = "Difference between electricity produced and absorbed by pumped hydro power") 
+
+#arranging the three ggplotly plots into one plot using the subplot() from the plotly package
+subplot(p3,p4,p5,margin = 0.05,titleY = TRUE,titleX = TRUE ) %>% 
+  #adding titles and the axis labels/titles for the subplot object
+  layout(title = "Difference between electricity produced and absorbed by pumped hydro power",
+yaxis = list(title = "Country"),
+yaxis2 = list(title = ""),
+yaxis3 = list(title = ""),
+xaxis = list(title = ""),
+xaxis2 = list(title = "Difference in electricity produced and absorbed"),
+xaxis3 = list(title = ""))
 ```
 
 # Conclusion 
