@@ -589,7 +589,50 @@ subplot(diff_plotly,hydro_plotly,margin = 0.23) %>%
 
 ```
 
+```{r pumped-power,message=FALSE,warning=FALSE}
+hydro <- energy_types %>% 
+  #filtering the pumped hydro power energy for a new dataframe 
+  filter(type == "Pumped hydro power") %>% 
+  #selecting columns other than country (codes) and level
+  select(- c(country,level)) 
 
+pumped_abs <- country_tab %>% 
+  #renaming column names within the dataframe country_tab for avoiding multiple columns of the same data 
+  rename(c("year_country" = "year", "country_full" = "country_name")) %>% 
+  #selecting only a few columns from the formed dataframe
+  select(energy_type,year_country,energy_used,country_full)
+
+#binding the two dataframes by columns cbind() function using the country names 
+binded_hydro <- cbind(hydro,pumped_abs, by.x = "country_name", by.y = "country_full") %>% 
+  #selecting columns other than year, country, by.x, by.y columns 
+  select(- c(year_country,country_full,by.x,by.y)) %>% 
+  #grouping by the country names and the year for computation
+  group_by(country_name,year) %>%
+  #mutating the dataframe for a difference values between the energy the pumped hydro power consumes and 
+  #the energy the pumped hydro power produces and creating a new column Diff_prod
+  mutate(Diff_prod = energy_used - energy) %>%  
+  #arranging in descending the Diff_prod column 
+  arrange(desc(Diff_prod)) %>% 
+  #filtering the column Diff_prod to leave out country names with a diff value = 0.00
+  filter(Diff_prod != 0.00)
+
+#plotting the above binded datframe on a bar graph 
+prod_plot <- ggplot(binded_hydro,
+       aes(x = reorder(country_name, - Diff_prod), 
+           y = Diff_prod, fill = year)) + 
+  geom_col() +
+  facet_wrap(~ year) + 
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "none") +
+  xlab("Country Name") +
+  ylab("Difference in production/consumption") +
+  #giving a title to the graph 
+  ggtitle("Electricity produced by Pumped Hydro vs Spent on Pumped Hydro")+
+  coord_flip()
+
+#adding the plot into the ggplotly function for interaction 
+ggplotly(prod_plot)
+```
 
 # Conclusion 
 
