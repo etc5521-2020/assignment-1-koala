@@ -530,9 +530,9 @@ cbind(malta_en,malta) %>%
 
 ```{r cmp,message=FALSE,warning=FALSE} 
 # removing the level column for our analysis
-prod <- energy_types %>% distinct(type) #select(-level)%>%  filter(year == 2017)
+prod <- energy_types %>% select(-level)%>%  
   #filtering the energy types to be hydro and pumped hydro for comparison
-  dplyr::filter(type ==c("Hydro" ,"Pumped hydro power"))
+  dplyr::filter(type %in% c("Hydro" ,"Pumped hydro power"))
 
 electricity_prod <- prod %>% 
   #converting the table above to wider format for computation
