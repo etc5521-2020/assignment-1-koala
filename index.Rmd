@@ -57,7 +57,7 @@ Additional Questions for Assignment 2 :
 2. How efficient is it produce electricity using pumped hydro power?
 3. What has the trend been like for EU countries to achieve their 2020 renewable energy target?
 
-We would like to address these new questions because we want to focus more on the original question, **"How sustainable is the energy production in Europe?"**. We think by picking out select renewable energy sources, like hydro power and pumped hydro power, it will help answer the sustainability question. More specifically, it would be useful to see how the renewable energy sources we have selected compare across countries to visualize how these countries are trying to be more sustainable in their energy production.
+We would like to address these new questions because we want to focus more on the original question, **"How sustainable is the energy production in Europe?"**. We think by picking out select renewable energy sources, like hydro power and pumped hydro power, it will help to give a more narrowed answer to the sustainability question. More specifically, it would be useful to see how the renewable energy sources we have selected compare across countries to visualize how these countries are trying to be more sustainable in their energy production.
 
 The original analysis excluded Pumped Hydro power. Pumped hydro power is listed as a level 2 energy type in the data, whereas Hydro power is listed as a level 1 energy type. The data in the tidytuesday package points out that level 2 makes up level 1 that makes up the total @mock_scherer_2020, meaning energy produced by Pumped Hydro power is included in Hydro power's energy production, which is the total energy production for both. However, there is clearly a difference between both these energy sources and we think it'll be interesting to look into these differences.
 
@@ -453,7 +453,7 @@ contribute_to_europe <- europe_energy_contribution(europe_total_energy,
                                                    europe_total_production)
 ```
 
-To get the energy proportion, the method we used is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. The \@ref(fig:chart-europe) figure shows the percentage of the contribution of energy types to the total electricity production in Europe for three years of observation (2016,2017,2018). The graph is produced using the `plotly` package, @plotly. From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the highest energy supply comprising of nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources, Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the only energy sources with the lowest contribution by not reaching 1%.
+To get the energy proportion, the method we used is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. Figure \@ref(fig:chart-europe) shows the percentage of the contribution of energy types to the total electricity production in Europe for 2016, 2017 and 2018. The graph is produced using the `plotly` package, @plotly. From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the highest energy supply comprising of nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources, Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the only energy sources with the lowest contribution by not reaching 1%.
 
 ```{r chart-europe, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in Europe"}
 library(plotly)
@@ -702,30 +702,43 @@ xaxis3 = list(title = ""))
 ## What has the trend been like for EU countries to achieve their 2020 renewable energy target?
 
 ```{r target-plot}
-target <- 
+target <- #filtering only the years 2010-2018
 ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) +
   geom_line() +
-  geom_point(data = euro_table %>% filter(Year == 2020)) +
-  annotate("text", x = 2020, y = 43, label = "2020 Target", colour = "red", size = 3) +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5)) +
-  scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) +
-  scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) +
-  theme(axis.text.x = element_text(angle = 90)) +
-  ylab("Share of energy consumed that is renewable energy (%)") +
-  ggtitle("Percentage of renewable energy consumed from 2010 - 2018") +
-  facet_wrap(~Country)
+  geom_point(data = euro_table %>% filter(Year == 2020)) + #filtering only to show the target value (2020) as a dot point on the graph
+  annotate("text", x = 2020, y = 43, label = "2020 Target", colour = "red", size = 3) + #adding a text on the graph to clearly show the dot point is the "2020 Target"
+  scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) + #adding breaks to the y-axis
+  scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) + #adding breaks on the x-axis to show every year from 2010-2018
+  theme(axis.text.x = element_text(angle = 90)) + #rotating the x-axis labels by 90 degrees
+  ylab("Share of energy consumed that is renewable energy (%)") + #adding a y-axis label
+  ggtitle("Percentage of renewable energy consumed from 2010 - 2018") + #adding a plot title
+  theme(legend.position = "none",               # excluding the legend
+        plot.title = element_text(hjust = 0.5)) + # centering the plot title
+  facet_wrap(~Country) #display a line graph for each country
 
 ggplotly(target)
 ```
 
+
+Figure \@ref(fig:target-plot) shows the % share of renewable energy consumed from 2010-2018 for each country. Although it looks like all the countries have only seen a constant trend towards their respective 2020 renewable energy target, if we take a closer look by hovering over the line for each country, we find that it has been increasing ever so slightly. 
+
+The dot point in 2020 represents the 2020 target for the respective country. Please take note that some countries do not have a target value as is mentioned in the limitations section. Also there is no value recorded for 2019 and so this does not appear on the graph. 
+
+From the graph, countries like Iceland, Finland, Norway and Sweden have the highest share of renewable energy. Norway consumed 72.75% of it's energy as renewable energy in 2018, followed by Iceland at 72.18%, Norway at 54.64% and Finland at 41.16%. Although Iceland and Norway don't have a 2020 target, they are well above their European counterparts and it is fair to say they have surpassed all renewable energy target level. Finland has surpassed their 2020 target level in 2014 and Sweden all the back in 2012!
+
+Cyprus, Denmark, Germany and the United Kingdom have a trend that is most noticeable to see as countries with the share of renewable energy consistently increasing over the years. Cyprus has increased from 6.1% in 13.8% and have already surpassed their 2020 target level of 13%! Denmark reported the largest increase over the 9 year period from 21.8% to 35.7% and reached their 2020 target of 30% way back in 2015! Germany has increased 11.6% to 16.4% and are on track to reach their 2020 target of 18%. The United Kingdom has increased from 3.7% to 11% and are on track to reach their 2020 target of 15%.
+
+Albania and Montenegro have been going down in the share of their renewable energy. Montenegro has reported a 5.2% reduction dropping from 44% in 2014 to 38.8% in 2018. Albania has seen an inconsistent trend and recently dropped to 34.8% in 2018 from an all time high of 35.5% in 2016.
+
 # Conclusion 
 
-From our analysis we can see France, Germany, Spain, Norway and Sweden are some of the countries that lead the European production of renewable energy with nuclear being the most prominent renewable energy produced. Across all three years the total renewable energy produced exceeds the total conventional thermal energy produced with 2018 being the highest year. However, although this shows positive signs in the movement towards renewable energy, conventional thermal energy still dominates production in many European countries such as Germany and the United Kingdom making just under half the total energy production across Europe across all three years. 
+From our analysis we can see France, Germany, Spain, Norway and Sweden are some of the countries that lead the European production of renewable energy with nuclear being the most prominent renewable energy produced. Across all three years the total renewable energy produced exceeds the total conventional thermal energy produced with 2018 being the highest year. Although this shows positive signs in the movement towards renewable energy, conventional thermal energy still dominates production in many European countries such as Germany and the United Kingdom making just under half the total energy production across Europe across all three years. 
 
-When assessing the exports to imports of energy across Europe we can see France and Germany lead in next exports also being the leading countries in renewable energy production. However, when assessing year to year we can see 2018 showed a net importation of energy compared to the net exportation in 2016 and 2017. 
+When assessing the exports to imports of energy across Europe we can see France and Germany lead in net exports and are the leading countries in renewable energy production. However, when assessing year over year, 2018 showed a net import of energy compared to the net export of energy in 2016 and 2017. 
 
-The energy type contribution of each country is still dominated by conventional thermal. Although some countries supply electricity in their country with renewable energy like Albania with hydro and wind power from Denmark. Solar provides a small percentage of energy supply, but several countries have implemented it.
+The energy type contribution of each country is still dominated by conventional thermal. Some countries like Albania and Denmark supply electricity in their country using renewable energy sources like hydro and wind power respectively. Although several countries have implemented solar power as an energy source, it only provides a small percentage of energy supply.
+
+Many countries have in fact surpassed their 2020 target level by 2018. Countries like Iceland, Norway, Sweden, Finland and Denmark are dominating the field and charging ahead of the pack to cement their status as the front runners in sustainability practices. Thus we can conclude that the European continent is adopting more of a renewable energy source as the means to generate, supply and consume its energy. This helps us to answer our original question and we can confidently say Europe is leading towards a more sustainable future as they adopt a renewable energy consumption approach.
 
 # References
 
