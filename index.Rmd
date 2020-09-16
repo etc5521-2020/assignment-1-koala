@@ -9,7 +9,12 @@ author:
   - (Putu Saputra)
 date: "`r Sys.Date()`"
 output: 
-  bookdown::html_document2
+  bookdown::html_document2:
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: yes
 bibliography: references.bib  
 ---
 
@@ -204,12 +209,15 @@ tibble(variables_3,class_3,desc_3) %>%
 ```
 
 
-```{r check-missing}
+```{r check-missing,message=FALSE,warning=FALSE,fig.cap="Missing values in table country_totals"}
+library(naniar)
 #vis_miss finds the missing values in the dataset and produces a plot for depicting the % of NA's in the dataset
 #m1 <- vis_miss(energy_types) 
-m2 <- vis_miss(country_totals)
-gridExtra::grid.arrange(m1,m2,ncol = 3)
+m2 <- vis_miss(country_totals) 
+m2
 ```
+
+Let's have a look at whether the datasets have any missing value, we check it using vis_miss() function from the naniar package as depicted in figure \@ref(fig:check-missing) we checked for both the dataframes and noticed that the dataframe energy_types has no missing values and the dataframe country_totals has a missing values of ~ 0.18% in the energy column within it.
 
 ## Limitations of Dataset
 
@@ -546,7 +554,7 @@ cbind(malta_en,malta) %>%
 
 ## What is the difference in energy produced between Hydro power and Pumped Hydro power?
 
-```{r cmp,message=FALSE,warning=FALSE} 
+```{r cmp,message=FALSE,warning=FALSE,fig.cap="Difference in electricity produced by pumped hydro and hydro power"} 
 # removing the level column for our analysis
 prod <- energy_types %>% select(-level) %>% 
   #filtering the energy types to be hydro and pumped hydro for comparison
@@ -556,9 +564,9 @@ electricity_prod <- prod %>%
   #converting the table above to wider format for computation
   pivot_wider(names_from = type, values_from = energy) %>%
   #grouping by country names and year for computation
-  group_by(country_name,year) %>% 
+  group_by(country_name,year) %>% rename(c("pumped_hydro_power" = "Pumped hydro power")) %>% 
   #calculating the difference between electricity produced by pumped hydro and hydro power and creating a new column called diff
-  mutate(diff = (Hydro - `Pumped hydro power`)) %>% 
+  mutate(diff = (Hydro - pumped_hydro_power)) %>% 
   #arranging the  new column diff by descending order to remove the 0.00 values in the plot
   arrange(desc(diff)) %>% 
   #taking into account the first 40 values for plot
@@ -592,7 +600,7 @@ hydro_pro <- energy_types %>% filter(type == "Hydro") %>%
   head(50)
 
 #plotting a bar graph for x-axis country names and y-axis with average energies 
-p2 <- ggplot(hydro_pro,aes(x = reorder(country_name,-avg_energy), y = avg_energy, fill = year)) + 
+p2 <- p2 <- ggplot(electricity_prod,aes(x = reorder(country_name,-pumped_hydro_power), y = pumped_hydro_power, fill = year)) + 
   geom_col() +
   theme(axis.text.x = element_text(angle = 90),legend.position = "none") +
   xlab("country name") + 
@@ -604,15 +612,22 @@ hydro_plotly <- ggplotly(p2)
 #arranging the two ggplotly plots into one plot using the subplot() from the plotly package
 subplot(diff_plotly,hydro_plotly,margin = 0.10,titleX = TRUE,titleY = TRUE) %>% 
   #adding the titles and the axis labels to the subplot object
-  layout(title = "Difference in electricity produced by pumped hydro and hydro power", 
-         xaxis = list(title = "Electricity produced by pumped hydro power"),
-         xaxis4 = list(title = "Electricity produced by hydro power"),
-         yaxis = list(title = "Country"))
+  layout(title = "Diff in electricity produced by pumped hydro & hydro power", 
+         xaxis2 = list(title = "Electricity by hydro power"),
+         xaxis5 = list(title = "Electricity by pumped hydro"),
+         yaxis = list(title = "Country"),
+         margin = list(l = 100, r = 20))
 ```
+
+Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power, when checked whether hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source (@altenergymag) .
+
+Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp), we notice that the electricity produced by hydro power is higher than the that of pumped hydro power. for example, when we consider the country Norway for all the years (2016,2017,2018) clearly it shows that there is huge amount of difference in the electricity production where it is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% select(country_name,avg_energy)` ** for year 2016,**`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% select(country_name,avg_energy)` ** for year 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% select(country_name,avg_energy)`** for year 2018 , whereas, electricity produced by the same country by using the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% select(pumped_hydro_power)`** for year 2016 , **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% select(pumped_hydro_power)` ** for year 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% select(pumped_hydro_power)`** for the year 2018.
+
+Just like Norway, every other country has a very low amount of pumped hydro power produced from that of the hydro power within the country. Some of the countries like Georgia, Serbia have very low counts of hydro power but even less or ~ 0 amount of electricity produced by either of the two techniques.
 
 ## How efficient is it produce electricity using Pumped Hydro power?
 
-```{r pumped-power,message=FALSE,warning=FALSE}
+```{r pumped-power,message=FALSE,warning=FALSE,fig.cap= "Difference between electricity produced & absorbed by pumped hydro power"}
 hydro <- energy_types %>% 
   #filtering the pumped hydro power energy for a new dataframe 
   filter(type == "Pumped hydro power") %>% 
@@ -644,7 +659,7 @@ binded_hydro <- cbind(hydro,pumped_abs, by.x = "country_name", by.y = "country_f
   group_by(country_name,year) %>%
   #mutating the dataframe for a difference values between the energy the pumped hydro power consumes and 
   #the energy the pumped hydro power produces and creating a new column Diff_prod
-  mutate(Diff_prod = energy_used - energy) %>%  
+  mutate(Diff_prod = energy - energy_used) %>%  
   #arranging in descending the Diff_prod column 
   arrange(desc(Diff_prod)) %>% 
   #filtering the column Diff_prod to leave out country names with a diff value = 0.00
@@ -687,9 +702,9 @@ prod_plot_18 <- ggplot(binded_hydro %>% filter(year == 2018),
 p5 <- ggplotly(prod_plot_18)
 
 #arranging the three ggplotly plots into one plot using the subplot() from the plotly package
-subplot(p3,p4,p5,margin = 0.05,titleY = TRUE,titleX = TRUE ) %>% 
+subplot(p3,p4,p5,nrows =1,margin = 0.11,titleY = TRUE,titleX = TRUE ) %>% 
   #adding titles and the axis labels/titles for the subplot object
-  layout(title = "Difference between electricity produced and absorbed by pumped hydro power",
+  layout(title = "Diff btwn electricity produced & absorbed by pumped hydro power",
 yaxis = list(title = "Country"),
 yaxis2 = list(title = ""),
 yaxis3 = list(title = ""),
@@ -698,6 +713,9 @@ xaxis2 = list(title = "Difference in electricity produced and absorbed"),
 xaxis3 = list(title = ""))
 ```
 
+Now, we compared the two dataframes energy_types and country_totals for the energy type "Pumped hydro power", there was something out of the ordinary in the country_totals table where the column type had a value *"energy absorbed for pumping"*, which really caught our attention, on further analyzing what this could be, we compared the amount of electricity produced by the pumped hydro power and the amount of energy consumed by the pumped hydro power to produce the same energy for different countries.
+
+The figure \@ref(fig:pumped-power) shows a bar graph with countries on its y-axis the difference in energy produced & absorbed within each of those countries across three years. **The years 2016, 2017 have a negative values which indicates that the energy used by the pumped hydro power technique was higher than the energy it produced **, although 2018 is also similar and holds true to the above statement, there are some countries which have improved its consumption:production ratio over the years. For instance, let's have a look at  **`r binded_hydro %>% filter(country_name == "Austria" & year == 2016) %>% select(energy_used)`** but in **`r binded_hydro %>% filter(country_name == "Austria" & year == 2018) %>% select(energy)`** and was one of the top countries for having a huge turn over in the consumption:production. Countries like *`r binded_hydro %>% filter(country_name == "Germany" & year == 2016) %>% select(energy_used)`* , *`r binded_hydro %>% filter(country_name == "Germany" & year == 2017) %>% select(energy_used)`* and in *`r binded_hydro %>% filter(country_name == "Germany" & year == 2018) %>% select(energy_used)`* have reduced the amount energy consumed/absorbed for production of energy.
 
 ## What has the trend been like for EU countries to achieve their 2020 renewable energy target?
 
@@ -737,6 +755,8 @@ From our analysis we can see France, Germany, Spain, Norway and Sweden are some 
 When assessing the exports to imports of energy across Europe we can see France and Germany lead in net exports and are the leading countries in renewable energy production. However, when assessing year over year, 2018 showed a net import of energy compared to the net export of energy in 2016 and 2017. 
 
 The energy type contribution of each country is still dominated by conventional thermal. Some countries like Albania and Denmark supply electricity in their country using renewable energy sources like hydro and wind power respectively. Although several countries have implemented solar power as an energy source, it only provides a small percentage of energy supply.
+
+The pumped hydro power which was earlier included within the hydro power analysis, also showed it's contribution to the energy production, although it does not produce the high amounts of energy as the other energy types, it is still being used and improved for better production. Furthermore, the pumped hydro consumes more amount of energy than it produces, although this has been improved in places like Austria,Norway, etc. over the years, they are still not producing a high amount of energy that is needed. 
 
 Many countries have in fact surpassed their 2020 target level by 2018. Countries like Iceland, Norway, Sweden, Finland and Denmark are dominating the field and charging ahead of the pack to cement their status as the front runners in sustainability practices. Thus we can conclude that the European continent is adopting more of a renewable energy source as the means to generate, supply and consume its energy. This helps us to answer our original question and we can confidently say Europe is leading towards a more sustainable future as they adopt a renewable energy consumption approach.
 
