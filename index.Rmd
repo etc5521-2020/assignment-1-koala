@@ -19,7 +19,7 @@ bibliography: references.bib
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-```{r libraries, include = FALSE, message = FALSE, warning = FALSE}
+```{r libraries, include = FALSE}
 library(tidytuesdayR)
 library(tidyverse)
 library(knitr)
@@ -29,6 +29,8 @@ library(bookdown)
 library(plotly)
 library(readr)
 library(readxl)
+library(naniar)
+library(lubridate)
 ```
 
 # Introduction and motivation
@@ -84,7 +86,7 @@ country_totals <- country_totals %>%
 country_totals$year <- as.numeric(country_totals$year)
 ```
 
-The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the brake down energy supplied by each country.
+The data in the tidytuesday package is taken from Eurostat that contains the electricity production of the countries in the European Union.  The data is given in tabular form in two tables, `country_totals` and `energy_types`. The `energy_types` table containing the types of energy produced by each country. The `country_totals` table contains the break down of energy supplied by each country.
 
 The variables in the `energy_types` table are included below in Table \@ref(tab:energy-tab-vr):
 
@@ -96,12 +98,12 @@ desc_1 <- c("Country ID",
            "Type of energy production",
            "Level - either total, level 1 or level 2. Where level 2 makes up level 1 that makes up the total",
            "Year of observation",
-           "Energy in GWh (Gigawatt hours)")
+           "Total Energy in GWh (Gigawatt hours)")
 ```
 
 ```{r energy-tab-vr, echo=FALSE}
 tibble(variables_1,class_1,desc_1) %>%
-  kable(col.names = c("variable","class","description"), caption ="Energy types variables") %>%
+  kable(col.names = c("Variable","Class","Description"), caption ="Energy types variables") %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
@@ -120,20 +122,11 @@ desc_2 <- c("Country ID",
 
 ```{r country-tab-vr, echo=FALSE}
 tibble(variables_2,class_2,desc_2) %>%
-  kable(col.names = c("variable","class","description"), caption ="Country total variables") %>%
+  kable(col.names = c("Variable","Class","Description"), caption ="Country total variables") %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
-The data in the tidytuesday package only contains yearly totals from 2016-2018. @tidytuesday However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information. @methodology_eurostat
-
-
-```{r check-missing,message=FALSE,warning=FALSE}
-library(naniar)
-#vis_miss finds the missing values in the dataset and produces a plot for depicting the % of NA's in the dataset
-#m1 <- vis_miss(energy_types) 
-m2 <- vis_miss(country_totals)
-gridExtra::grid.arrange(m1,m2,ncol = 3)
-```
+The data in the tidytuesday package only contains yearly totals from 2016-2018, @tidytuesday. However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information, @methodology_eurostat.
 
 ```{r target-energy, eval=FALSE}
 target_energy <- read_tsv("data/t2020_31.tsv")
@@ -146,8 +139,8 @@ target_energy <- target_energy[c(-12,-13,-14), 2:18]
 target_energy <- as_tibble(target_energy) 
 ```
 
-```{r tidying-data}
-euro_table <- read_xls("data/euro_table.xls")
+```{r tidying-data, include=FALSE}
+euro_table <- read_xls("data/euro_table.xls") #reading in data
 euro_table <- euro_table %>% rename(Country = `Share of renewable energy in gross final energy consumption`,
                       `2004` = ...2,
                       `2005` = ...3,
@@ -164,11 +157,11 @@ euro_table <- euro_table %>% rename(Country = `Share of renewable energy in gros
                       `2016` = ...14,
                       `2017` = ...15,
                       `2018` = ...16,
-                      `2020` = ...17)
-euro_table <- euro_table[c((-1:-5),(-43:-50)),]
-euro_table[37,1] <- "Kosovo"
-euro_table <- euro_table[-31,] #excluding switzerland because there are no values.
-euro_table$`2004` <- as.numeric(euro_table$`2004`)
+                      `2020` = ...17) #renaming the columns to appropriate names
+euro_table <- euro_table[c((-1:-5),(-43:-50)),] #removing unnecessary rows and columns from the dataset
+euro_table[37,1] <- "Kosovo" #changing the name of Kosovo from its long form to a short form
+euro_table <- euro_table[-31,] #excluding Switzerland because there are no values
+euro_table$`2004` <- as.numeric(euro_table$`2004`) #changing all the year columns to numeric data type
 euro_table$`2005` <- as.numeric(euro_table$`2005`)
 euro_table$`2006` <- as.numeric(euro_table$`2006`)
 euro_table$`2007` <- as.numeric(euro_table$`2007`)
@@ -186,30 +179,44 @@ euro_table$`2018` <- as.numeric(euro_table$`2018`)
 euro_table$`2020` <- as.numeric(euro_table$`2020`)
 ```
 
-```{r target-longer}
-euro_table <- euro_table %>% pivot_longer(cols = `2004`:`2020`, names_to = "Year", values_to = "Percentage")
-euro_table$Year <- as.Date(as.character(euro_table$Year), format = "%Y")
-library(lubridate)
-euro_table$Year <- year(euro_table$Year)
+```{r target-longer, include=FALSE}
+euro_table <- euro_table %>% pivot_longer(cols = `2004`:`2020`, names_to = "Year", values_to = "Percentage") # changing the dataset from a wide format to long format by taking all the Year columns and putting them into a single "Year" column and all their respective values into a "Percentage" column
+euro_table$Year <- as.Date(as.character(euro_table$Year), format = "%Y") #changing the "Year" column data type to date
+euro_table$Year <- year(euro_table$Year) #Taking only the year of the date
 ```
 
-```{r target-plot}
-target <- 
-ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) +
-  geom_line() +
-  geom_point(data = euro_table %>% filter(Year == 2020)) +
-  #geom_text(x = 2020, y = 43, label = "2020 Target", size = 3) +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5)) +
-  scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) +
-  scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) +
-  theme(axis.text.x = element_text(angle = 90)) +
-  ylab("Share of energy consumed that is renewable energy (%)") +
-  ggtitle("Percentage of renewable energy consumed from 2010 - 2018") +
-  facet_wrap(~Country)
+To answer how the trend has been for EU countries to reach their 2020 target, we needed further data. Thus we obtained an external dataset from the Eurostat website which provides information on each European country's renewable energy % share of the final energy consumption. The data is in a tabular format and provides the % share values from 2009-2018 and a target column which represents the country's 2020 target value, @eurostat_2018. The source of this data is accredited to the European Environment Agency (EEA).
 
-ggplotly(target)
+The variables in the `euro_table` table are included below in Table \@ref(tab:euro-tab-vr): 
+
+```{r, include = FALSE}
+variables_3 <- euro_table %>% names()
+class_3 <- sapply(euro_table, class)
+desc_3 <- c("Country name",
+            "Year of observation",
+           "Share of renewable energy (%)")
 ```
+
+```{r euro-tab-vr, echo=FALSE}
+tibble(variables_3,class_3,desc_3) %>%
+  kable(col.names = c("Variable","Class","Description"), caption ="European table variables") %>%
+  kable_styling(bootstrap_options = "hover")
+```
+
+
+```{r check-missing}
+#vis_miss finds the missing values in the dataset and produces a plot for depicting the % of NA's in the dataset
+#m1 <- vis_miss(energy_types) 
+m2 <- vis_miss(country_totals)
+gridExtra::grid.arrange(m1,m2,ncol = 3)
+```
+
+## Limitations of Dataset
+
+Some of the limitations to the `euro_table` dataset that might affect possible analysis are:
+
+- There is no information on the renewable % share of final energy consumption for 2019. This will affect our analysis as there will be a gap between 2018 and the target year 2020, to see how the country has been performing. Without this information, it will be hard to transparently judge if a country is truly on track to reach it's 2020 target.
+- There is no 2020 target information for some countries. This hampers our analysis as we cannot fairly judge if a country is meeting its sustainable target and contributing to overall sustainability in Europe.
 
 # Analysis and findings
 
@@ -538,6 +545,7 @@ cbind(malta_en,malta) %>%
   kable_styling("hover")
 ```
 
+## What is the difference in energy produced between Hydro power and Pumped Hydro power?
 
 ```{r cmp,message=FALSE,warning=FALSE} 
 # removing the level column for our analysis
@@ -602,6 +610,8 @@ subplot(diff_plotly,hydro_plotly,margin = 0.10,titleX = TRUE,titleY = TRUE) %>%
          xaxis4 = list(title = "Electricity produced by hydro power"),
          yaxis = list(title = "Country"))
 ```
+
+## How efficient is it produce electricity using Pumped Hydro power?
 
 ```{r pumped-power,message=FALSE,warning=FALSE}
 hydro <- energy_types %>% 
@@ -687,6 +697,27 @@ yaxis3 = list(title = ""),
 xaxis = list(title = ""),
 xaxis2 = list(title = "Difference in electricity produced and absorbed"),
 xaxis3 = list(title = ""))
+```
+
+
+## What has the trend been like for EU countries to achieve their 2020 renewable energy target?
+
+```{r target-plot}
+target <- 
+ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) +
+  geom_line() +
+  geom_point(data = euro_table %>% filter(Year == 2020)) +
+  annotate("text", x = 2020, y = 43, label = "2020 Target", colour = "red", size = 3) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) +
+  scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  ylab("Share of energy consumed that is renewable energy (%)") +
+  ggtitle("Percentage of renewable energy consumed from 2010 - 2018") +
+  facet_wrap(~Country)
+
+ggplotly(target)
 ```
 
 # Conclusion 
