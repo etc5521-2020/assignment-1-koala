@@ -453,7 +453,7 @@ contribute_to_europe <- europe_energy_contribution(europe_total_energy,
                                                    europe_total_production)
 ```
 
-To get the energy proportion, the method we use is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. The \@ref(fig:chart-europe) figure shows the percentage of the contribution of energy types to the total electricity production in Europe for three years of observation (2016,2017,2018). The graph produced using `plotly` package. @plotly From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the most massive supply, with nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the type of energy with the smallest contribution by not reaching 1%.
+To get the energy proportion, the method we used is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. The \@ref(fig:chart-europe) figure shows the percentage of the contribution of energy types to the total electricity production in Europe for three years of observation (2016,2017,2018). The graph is produced using the `plotly` package, @plotly. From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the highest energy supply comprising of nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources, Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the only energy sources with the lowest contribution by not reaching 1%.
 
 ```{r chart-europe, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in Europe"}
 library(plotly)
@@ -490,8 +490,7 @@ p <- contribute_to_europe %>%
 ggplotly(a, tooltip = c("fill","y"))
 ```
 
-Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-3y) In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs in their country. However, it is interesting that Albania relies almost mostly on hydropower. The same situation occurs in Norway and Georgia which rely on hydro over than 80%.
-Meanwhile, The energy intake in France, Slovakia, and Hungary are dominated by nuclear power. France which has 58 nuclear power reactors is the highest country with almost 71% nuclear contribution for its country. @iaea_country While Slovakia and Hungary more than 50% nuclear energy contribution. Denmark is the country with the most significant wind power utilization with nearly 48%, followed by Lithuania and Ireland. As for solar energy, many have adopted it, but the percentage is still small. Italy utilise solar about 8% and Greece around 7.7%. Not many countries use geothermal, only Italy and Turkey with around 2% percentage.
+Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-3y). In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs for their country. However, it is interesting that Albania relies almost mostly on Hydro power. The same situation occurs in Norway and Georgia which rely on Hydro power to provide them more than 80% of their energy source. Meanwhile, the energy intake in France, Slovakia, and Hungary are dominated by nuclear power. France has 58 nuclear power reactors and is the highest country with almost 71% nuclear contribution for its country, @iaea_country. While Slovakia and Hungary have more than 50% nuclear energy contribution. Denmark is the country with the most significant wind power utilization with nearly 48%, followed by Lithuania and Ireland at 32% and 25% respectively. As for solar energy, many have adopted it, but it is not that popular. The top 3 countries that utilize solar power are Italy, Greece and Germany where it produces about 8%, 7.7% and 6.85% respectively. Only Italy and Turkey use geothermal as an energy source producing around 2%.
 
 ```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country"}
 create_plot <- function(df){
@@ -525,7 +524,7 @@ df_tbl %>%
 ggplotly(create_plot(en_contribution_3y))
 ```
 
-The interesting part if we look at Malta, who did not get a full production of energy. After we check the dataset, found out that the total amount of net production is not equal by sum of energy types production in observation year. As seen in Table \@ref(tab:tbl-malta), Malta did not list any energy type in 2018 except Conventional Thermal. So that there is an insufficient value when we calculate the contributions.
+If we take a closer look at Malta, it's interesting to find that they are the only country to not have full 100% energy production. After checking the dataset, we found out that the total amount of net production does not equal to sum of energy types production in all observed years. As seen in Table \@ref(tab:tbl-malta), Malta did not list any energy type in 2018 except for Conventional Thermal. So there is an insufficient value when we calculate the contributions.
 
 ```{r tbl-malta, echo=FALSE}
 malta <- rbind(country_total_2016,
