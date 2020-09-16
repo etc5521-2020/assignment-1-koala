@@ -5,6 +5,8 @@ team: Koala
 author:
   - Varsha Ujjinni VijayKumar
   - Justin Thomas
+  - (Vinny Vu)
+  - (Putu Saputra)
 date: "`r Sys.Date()`"
 output: 
   bookdown::html_document2
@@ -31,19 +33,21 @@ library(readxl)
 
 # Introduction and motivation
 
-In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," @peninsula_2018 These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” @twardy_greenhouse_2007 Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
+In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy, fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," @peninsula_2018 These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” @twardy_greenhouse_2007 Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
 
-Per Our World Data Europe is currently the 3rd highest consumer of primary energy behind Asia pacific and North America making up approximately 15% of the total World Energy Consumption @ritchie_energy_2014.  
+Per Our World Data, Europe is currently the 3rd highest consumer of primary energy behind Asia Pacific and North America making up approximately 15% of the total World Energy Consumption @ritchie_energy_2014.  
 
-As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” @energiewende_european_2018 in favor cleaner, renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) assess how successful they currently are and answer the question:  
+As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” @energiewende_european_2018 in favor of cleaner and more renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) to assess how successful they currently are and answer the questions:  
 
 
 How sustainable is the energy production in Europe? 
 
 Specifically:
 
-1. Which countries have the highest production of sustainable energy based on energy types? 2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
-3. How the contributions of the sources to the production of electricity?
+1. Which countries have the highest production of sustainable energy based on energy types?
+2. How do energy imports vs exports compare between countries in Europe from 2016-2018?
+3. What are energy types that contribute to the total production of electricity for each country in Europe?
+
 
 Additional Questions for Assignment 2 :
 
@@ -51,6 +55,13 @@ Additional Questions for Assignment 2 :
 2. How efficient is it produce electricity using pumped hydro power?
 3. What has the trend been like for EU countries to achieve their 2020 renewable energy target?
 
+We would like to address these new questions because we want to focus more on the original question, **"How sustainable is the energy production in Europe?"**. We think by picking out select renewable energy sources, like hydro power and pumped hydro power, it will help answer the sustainability question. More specifically, it would be useful to see how the renewable energy sources we have selected compare across countries to visualize how these countries are trying to be more sustainable in their energy production.
+
+The original analysis excluded Pumped Hydro power. Pumped hydro power is listed as a level 2 energy type in the data, whereas Hydro power is listed as a level 1 energy type. The data description points out that the level 2 energy is included as a part of level 1, meaning energy produced by Pumped Hydro power is included in Hydro power's energy production. However, there is clearly a difference between both these energy sources and we think it'll be interesting to look into these differences.
+
+We also think it is interesting to look at how countries have been performing to reach their 2020 renewable energy target because it gives an overview into which country is taking a more proactive approach to becoming more sustainable. Thus, we are curious to see how countries have fared as of 2018 to see whether they are on track to reach their goal.
+
+We are broadening the scope of the original analysis by addressing question 2. It is not adequate enough to say a country is adopting a more sustainable approach in their energy production if they way they produce that energy is inefficient. Therefore, we want to address efficiency in our analysis as well. In particular, we have found data that validates the fact that some countries use up more energy than produce energy when using pumped hydro power as an energy source. Our analysis will look deeper into this.
 
 # Data description
 
