@@ -27,13 +27,13 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r libraries, include = FALSE}
-library(tidytuesdayR)
-library(tidyverse)
-library(knitr)
-library(ggplot2)
-library(kableExtra)
-library(bookdown)
-library(plotly)
+library(tidytuesdayR) 
+library(tidyverse) 
+library(knitr) 
+library(ggplot2) 
+library(kableExtra) 
+library(bookdown) 
+library(plotly) 
 library(readr)
 library(readxl)
 library(naniar)
@@ -288,7 +288,7 @@ average_production_plot <- ggplot(average_production, aes(x = Value,
   theme(axis.text.x = element_text(angle = 90)) + #rotating x axis to values do not overlap 
   xlab("Energy in GWh(Gigawatt hours)") +
   ylab("") +
-  ggtitle("Average energy production by energy type from 2016-2018") 
+  ggtitle("Average energy production by type from 2016-2018") 
        
 ```
 
@@ -497,7 +497,7 @@ contribute_to_europe <- europe_energy_contribution(europe_total_energy,
                                                    europe_total_production)
 ```
 
-To get the energy proportion, the method we used is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. Figure \@ref(fig:chart-europe) shows the percentage of the contribution of energy types to the total electricity production in Europe for 2016, 2017 and 2018. The graph is produced using the `plotly` package, (@plotly). From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the highest energy supply comprising of nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources, Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the only energy sources with the lowest contribution by not reaching 1%.
+To get the energy proportion, the method we used is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. Figure \@ref(fig:chart-europe) shows the percentage of the contribution of energy types to the total electricity production in Europe for 2016, 2017 and 2018. From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the highest energy supply comprising of nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources, Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the only energy sources with the lowest contribution by not reaching 1%.
 
 ```{r chart-europe, fig.cap="The proportion of each energy type to the total energy production in Europe"}
 p <- contribute_to_europe %>%
@@ -802,8 +802,24 @@ The pumped hydro power which was earlier included within the hydro power analysi
 
 Many countries have in fact surpassed their 2020 target level by 2018. Countries like Iceland, Norway, Sweden, Finland and Denmark are dominating the field and charging ahead of the pack to cement their status as the front runners in sustainability practices. Thus we can conclude that the European continent is adopting more of a renewable energy source as the means to generate, supply and consume its energy. This helps us to answer our original question and we can confidently say Europe is leading towards a more sustainable future as they adopt a renewable energy consumption approach.
 
+# Acknowledgment
+
+@bookdown\
+@forcats\
+@ggplot2\
+@kableExtra\
+@knitr\
+@lubridate\
+@naniar\
+@plotly\
+@readr\
+@readxl\
+@scales\
+@tidytuesday\
+@tidyverse
 
 
 # References
+
 
 @energygif
