@@ -263,6 +263,7 @@ To assess which countries lead in renewable energy production we have used the e
 
 
 ```{r average_production_plot }
+options(scipen = 999)
 average_production <- energy_types %>%
   filter(type != "Pumped hydro power") %>% # filtering out pumped hydro power which is already included as hydro power 
   group_by(country_name,type) %>%
@@ -274,9 +275,10 @@ average_production <- energy_types %>%
   mutate(`Conventional thermal` = -`Conventional thermal`) %>% # making conventional thermal energy into a negative value 
   pivot_longer(cols = -c(country_name,Total_Renewable),
                names_to = "Energy Type",
-               values_to = "value")  #converting the tibble back into long form to allow plotting 
+               values_to = "Value")  #converting the tibble back into long form to allow plotting 
 #average_production$value <- format(average_production$value,scientific = FALSE)
-average_production_plot <- ggplot(average_production, aes(x = value, # reordering the country names by total renewable energy production 
+average_production_plot <- ggplot(average_production, aes(x = Value, 
+                                                          # reordering the country names by total renewable energy production 
              y = reorder(country_name,-Total_Renewable), 
             #y=country_name,
              fill = `Energy Type`)) +
@@ -286,11 +288,11 @@ average_production_plot <- ggplot(average_production, aes(x = value, # reorderin
   ylab("") +
   ggtitle("Average energy production by energy type from 2016-2018") 
        
-
 ```
 
 ```{r average-production-plotly, fig.cap= "Average Renewable vs Non-Renewable Energy Production from 2016-2018" }
 ggplotly(average_production_plot)
+  #style(text = paste0(signif(average_production$value, digits = 6), "\n", average_production$country_name, "\n", average_production$`Energy Type`), traces = 1:37) 
 ```
 
 
@@ -304,11 +306,11 @@ yearly_production_plot <- energy_types %>%
               values_from = total) %>% # making energy types into columns to allow manipulation of values 
   mutate(`Total Renewable` = Geothermal + Hydro + Nuclear + Other + Solar + Wind) %>% # calculating total renewable energy 
   pivot_longer(cols = -year,
-               names_to = "type",
-               values_to = "total") %>% # converting back to long form to allow plotting 
-  ggplot(aes(x = reorder(type,-total),
-             y = total,
-             fill = type)) +
+               names_to = "Type",
+               values_to = "Total") %>% # converting back to long form to allow plotting 
+  ggplot(aes(x = reorder(Type,-Total),
+             y = Total,
+             fill = Type)) +
   geom_col() +
   facet_wrap(~year) +
   theme(axis.text.x = element_text(angle = 90), #rotating the x axis to prevent values overlapping 
@@ -326,7 +328,7 @@ To look closer at European energy production across the 3 years the plot in \@re
 ```{r yearly-production-plotly, fig.cap= "Total Energy Production by Type and Year"}
 y <- list(title = "Total energy production in GWh (Gigawatt hours)", titlefont = list(size=14), automargin = TRUE) 
 
-ggplotly(yearly_production_plot) %>% #outputting yearly_production_plot as a plotly 
+ggplotly(yearly_production_plot, tooltip = "y") %>% #outputting yearly_production_plot as a plotly 
   layout(yaxis = y)
 ```
 
@@ -495,8 +497,7 @@ contribute_to_europe <- europe_energy_contribution(europe_total_energy,
 
 To get the energy proportion, the method we used is to divide the total energy by type by the total energy production. The results obtained are in the form of a percentage. Figure \@ref(fig:chart-europe) shows the percentage of the contribution of energy types to the total electricity production in Europe for 2016, 2017 and 2018. The graph is produced using the `plotly` package, (@plotly). From the data shown on the graph, in general, there are differences in the contribution of each energy type. Thermal energy is still the highest energy supply comprising of nearly 50% of total European production. Nuclear energy outperforms three renewable energy sources, Hydro, Wind, and Solar by more than 20%. Geothermal and other energy sources are the only energy sources with the lowest contribution by not reaching 1%.
 
-```{r chart-europe, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in Europe"}
-library(plotly)
+```{r chart-europe, fig.cap="The proportion of each energy type to the total energy production in Europe"}
 p <- contribute_to_europe %>%
     pivot_longer(cols=c(2:8),
                  names_to = "contribution",
@@ -532,7 +533,7 @@ ggplotly(a, tooltip = c("fill","y"))
 
 Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-3y). In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs for their country. However, it is interesting that Albania relies almost mostly on Hydro power. The same situation occurs in Norway and Georgia which rely on Hydro power to provide them more than 80% of their energy source. Meanwhile, the energy intake in France, Slovakia, and Hungary are dominated by nuclear power. France has 58 nuclear power reactors and is the highest country with almost 71% nuclear contribution for its country, (@iaea_country). While Slovakia and Hungary have more than 50% nuclear energy contribution. Denmark is the country with the most significant wind power utilization with nearly 48%, followed by Lithuania and Ireland at 32% and 25% respectively. As for solar energy, many have adopted it, but it is not that popular. The top 3 countries that utilize solar power are Italy, Greece and Germany where it produces about 8%, 7.7% and 6.85% respectively. Only Italy and Turkey use geothermal as an energy source producing around 2%.
 
-```{r plot-contribution-country, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country"}
+```{r plot-contribution-country, fig.cap="The proportion of each energy type to the total energy production in each country"}
 create_plot <- function(df){
 df_tbl <-  df %>%
     pivot_longer(cols=c(2:8),
@@ -560,13 +561,13 @@ df_tbl %>%
 }
 ```
 
-```{r plot-contribution-country-3y, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="The proportion of each energy type to the total energy production in each country in 3 years"}
+```{r plot-contribution-country-3y, fig.cap="The proportion of each energy type to the total energy production in each country in 3 years"}
 ggplotly(create_plot(en_contribution_3y))
 ```
 
 If we take a closer look at Malta, it's interesting to find that they are the only country to not have full 100% energy production. After checking the dataset, we found out that the total amount of net production does not equal to sum of energy types production in all observed years. As seen in Table \@ref(tab:tbl-malta), Malta did not list any energy type in 2018 except for Conventional Thermal. So there is an insufficient value when we calculate the contributions.
 
-```{r tbl-malta, echo=FALSE}
+```{r tbl-malta}
 malta <- rbind(country_total_2016,
       country_total_2017,
       country_total_2018) %>%
@@ -651,9 +652,9 @@ subplot(diff_plotly,hydro_plotly,margin = 0.10,titleX = TRUE,titleY = TRUE) %>%
          margin = list(l = 100, r = 20))
 ```
 
-Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power, when checked whether hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source (@altenergymag).
+Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power. When researching into hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source @altenergymag.
 
-Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp), we notice that the electricity produced by hydro power is higher than that of pumped hydro power. For example, Norway for all the years (2016,2017,2018) clearly it shows that there is a huge amount of difference in the electricity production where it is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% select(country_name,avg_energy)` ** for year 2016,**`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% select(country_name,avg_energy)` ** for year 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% select(country_name,avg_energy)`** for year 2018 , whereas, electricity produced by the same country through the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% select(pumped_hydro_power)`** for year 2016 , **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% select(pumped_hydro_power)` ** for year 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% select(pumped_hydro_power)`** for the year 2018.
+Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp). We notice that the electricity produced by hydro power is higher than that of pumped hydro power. For example, Norway for all the years (2016, 2017, 2018) clearly it shows that there is a huge amount of difference in the electricity production where it is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% select(country_name,avg_energy)` ** for year 2016,**`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% select(country_name,avg_energy)` ** for year 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% select(country_name,avg_energy)`** for year 2018 , whereas, electricity produced by the same country through the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% select(pumped_hydro_power)`** for year 2016 , **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% select(pumped_hydro_power)` ** for year 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% select(pumped_hydro_power)`** for the year 2018.
 
 Just like Norway, every other country has a very low amount of pumped hydro power produced compared to the hydro power within the country. Some of the countries like Georgia and Serbia have very low counts of hydro power but even less or around 0 GWh amount of electricity produced by either of the two techniques.
 
@@ -746,9 +747,9 @@ xaxis2 = list(title = "Difference in electricity produced and absorbed"),
 xaxis3 = list(title = ""))
 ```
 
-Now, we compared the two dataframes energy_types and country_totals for the energy type "Pumped hydro power". There was something out of the ordinary in the country_totals table where the column type had a value *"energy absorbed for pumping"*, which really caught our attention, on further analyzing what this could be, we compared the amount of electricity produced by the pumped hydro power and the amount of energy consumed by the pumped hydro power to produce the same energy for different countries.
+Now, we compared the two dataframes; energy_types and country_totals for the energy type "Pumped hydro power". There was something out of the ordinary in the country_totals table where the column type had a value *"energy absorbed for pumping"*, which really caught our attention. On further analyzing what this could be, we compared the amount of electricity produced by the pumped hydro power and the amount of energy consumed by the pumped hydro power to produce the same energy for different countries.
 
-The figure \@ref(fig:pumped-power) shows a bar graph with countries on its y-axis the difference in energy produced & absorbed within each of those countries across three years. **The years 2016, 2017 have a negative values which indicates that the energy absorbed by the pumped hydro power technique was higher than the energy it produced **, although 2018 is also similar and holds true to the above statement, there are some countries which have improved its consumption:production ratio over the years. For instance, let's have a look at  **`r binded_hydro %>% filter(country_name == "Austria" & year == 2016) %>% select(energy_used)`** but in **`r binded_hydro %>% filter(country_name == "Austria" & year == 2018) %>% select(energy)`** and was one of the top countries for having a huge turn over in the consumption:production ratio. Countries like *`r binded_hydro %>% filter(country_name == "Germany" & year == 2016) %>% select(energy_used)`* , *`r binded_hydro %>% filter(country_name == "Germany" & year == 2017) %>% select(energy_used)`* and in *`r binded_hydro %>% filter(country_name == "Germany" & year == 2018) %>% select(energy_used)`* have reduced the amount energy consumed/absorbed for production of energy.
+Figure \@ref(fig:pumped-power) shows a bar graph with countries on its y-axis and the difference in energy produced & absorbed within each of those countries across three years shown on the x-axis. **The years 2016 and 2017 have negative values which indicates that the energy absorbed by the pumped hydro power technique was higher than the energy it produced **. Although 2018 is also similar and holds true to the above statement, there are some countries which have improved its consumption:production ratio over the years. For instance, let's have a look at  **`r binded_hydro %>% filter(country_name == "Austria" & year == 2016) %>% select(energy_used)`** but in **`r binded_hydro %>% filter(country_name == "Austria" & year == 2018) %>% select(energy)`**, it was one of the top countries for having a huge turn over in the consumption:production ratio. Countries like *`r binded_hydro %>% filter(country_name == "Germany" & year == 2016) %>% select(energy_used)`* , *`r binded_hydro %>% filter(country_name == "Germany" & year == 2017) %>% select(energy_used)`* and in *`r binded_hydro %>% filter(country_name == "Germany" & year == 2018) %>% select(energy_used)`* have reduced the amount of energy consumed/absorbed for production of energy.
 
 ## What has the trend been like for EU countries to achieve their 2020 renewable energy target?
 
@@ -757,18 +758,18 @@ target <- #filtering only the years 2010-2018
 ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) +
   geom_line() +
   geom_point(data = euro_table %>% filter(Year == 2020)) + #filtering only to show the target value (2020) as a dot point on the graph
-  annotate("text", x = 2020, y = 43, label = "2020 Target", colour = "red", size = 3) + #adding a text on the graph to clearly show the dot point is the "2020 Target"
+  #annotate("text", x = 2020, y = 43, label = "2020 Target", colour = "red", size = 3) + #adding a text on the graph to clearly show the dot point is the "2020 Target"
   scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) + #adding breaks to the y-axis
   scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) + #adding breaks on the x-axis to show every year from 2010-2018
   theme(axis.text.x = element_text(angle = 90)) + #rotating the x-axis labels by 90 degrees
   ylab("Share of energy consumed that is renewable energy (%)") + #adding a y-axis label
   ggtitle("Percentage of renewable energy consumed from 2010 - 2018") + #adding a plot title
   theme(legend.position = "none",               # excluding the legend
-        plot.title = element_text(hjust = 0.5),# centering the plot title
-        plot.margin = unit(c(20,20,20,20),"lines"),
-        axis.title.y = element_text(margin = unit(c(0,0,0,20),"lines")),
-        axis.title.x = element_text(margin = unit(c(0,0,20,0),"lines"))) + 
-  facet_wrap(~Country) #display a line graph for each country
+        plot.title = element_text(hjust = 0.5), # centering the plot title
+        plot.margin = unit(c(0.5,0.5,0.5,0.5),"lines"),
+        #axis.title.y.left = element_text(margin = unit(c(0,0,0,1),"lines")),
+        axis.title.x = element_text(margin = unit(c(3,3,5,3),"lines"))) + 
+  facet_wrap(~Country, ncol = 9) #display a line graph for each country
 
 ggplotly(target) 
 ```
