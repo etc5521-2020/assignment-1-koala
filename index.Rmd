@@ -38,6 +38,8 @@ library(readr)
 library(readxl)
 library(naniar)
 library(lubridate)
+library(forcats)
+library(scales)
 ```
 
 ```{css}
@@ -606,12 +608,12 @@ electricity_prod <- prod %>%
   head(40)
 
 #plotting a bar graph with x-axis country names and y-axis as the difference value 
-p1 <- ggplot(electricity_prod,aes(x = reorder(country_name,-diff), y = diff, fill = year)) + 
+p1 <- ggplot(electricity_prod,aes(x = fct_reorder(country_name,-diff), y = diff, fill = year)) + 
   geom_col()+ 
   #setting the country names to display at a angle 90 for readability
   theme(axis.text.x = element_text(angle = 90),legend.position = "none") +
   #giving the scales a pretty accurate scales instead of a e-scales using the scales package
-  scale_y_continuous(labels = scales::number_format())+
+  scale_y_continuous(labels = number_format())+
   #changing the x-axis title/label to country names
   xlab("country names") + 
   #facet wrapping the plots by year
@@ -633,7 +635,7 @@ hydro_pro <- energy_types %>% filter(type == "Hydro") %>%
   head(50)
 
 #plotting a bar graph for x-axis country names and y-axis with average energies 
-p2 <- p2 <- ggplot(electricity_prod,aes(x = reorder(country_name,-pumped_hydro_power), y = pumped_hydro_power, fill = year)) + 
+p2 <- p2 <- ggplot(electricity_prod,aes(x = fct_reorder(country_name,-pumped_hydro_power), y = pumped_hydro_power, fill = year)) + 
   geom_col() +
   theme(axis.text.x = element_text(angle = 90),legend.position = "none") +
   xlab("country name") + 
@@ -652,7 +654,10 @@ subplot(diff_plotly,hydro_plotly,margin = 0.10,titleX = TRUE,titleY = TRUE) %>%
          margin = list(l = 100, r = 20))
 ```
 
-Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power. When researching into hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source @altenergymag.
+
+In figure \@ref(fig:cmp), we utilised a coding tip we learnt in lecture 4 to help us visualize the plot better. We used the "forcats::fct_reorder" function to reorder the way the countries are arranged. Our code displays the countries' value in a descending order. Thus countries with a lower difference value/ pumped hydro value will be displayed last. However, since we used the "coord_flip" function, we reversed the axes and now our graph appears to show countries with a lower difference value/ pumped hydro value at the top of the plot.
+
+Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power. When researching into hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source (@altenergymag).
 
 Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp). We notice that the electricity produced by hydro power is higher than that of pumped hydro power. For example, Norway for all the years (2016, 2017, 2018) clearly it shows that there is a huge amount of difference in the electricity production where it is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% select(country_name,avg_energy)` ** for year 2016,**`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% select(country_name,avg_energy)` ** for year 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% select(country_name,avg_energy)`** for year 2018 , whereas, electricity produced by the same country through the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% select(pumped_hydro_power)`** for year 2016 , **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% select(pumped_hydro_power)` ** for year 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% select(pumped_hydro_power)`** for the year 2018.
 
@@ -747,7 +752,7 @@ xaxis2 = list(title = "Difference in electricity produced and absorbed"),
 xaxis3 = list(title = ""))
 ```
 
-Now, we compared the two dataframes; energy_types and country_totals for the energy type "Pumped hydro power". There was something out of the ordinary in the country_totals table where the column type had a value *"energy absorbed for pumping"*, which really caught our attention. On further analyzing what this could be, we compared the amount of electricity produced by the pumped hydro power and the amount of energy consumed by the pumped hydro power to produce the same energy for different countries.
+Now, we compared the two dataframes, energy_types and country_totals for the energy type "Pumped hydro power". There was something out of the ordinary in the country_totals table where the column type had a value *"energy absorbed for pumping"*, which really caught our attention. On further analyzing what this could be, we compared the amount of electricity produced by the pumped hydro power and the amount of energy consumed by the pumped hydro power to produce the same energy for different countries.
 
 Figure \@ref(fig:pumped-power) shows a bar graph with countries on its y-axis and the difference in energy produced & absorbed within each of those countries across three years shown on the x-axis. **The years 2016 and 2017 have negative values which indicates that the energy absorbed by the pumped hydro power technique was higher than the energy it produced **. Although 2018 is also similar and holds true to the above statement, there are some countries which have improved its consumption:production ratio over the years. For instance, let's have a look at  **`r binded_hydro %>% filter(country_name == "Austria" & year == 2016) %>% select(energy_used)`** but in **`r binded_hydro %>% filter(country_name == "Austria" & year == 2018) %>% select(energy)`**, it was one of the top countries for having a huge turn over in the consumption:production ratio. Countries like *`r binded_hydro %>% filter(country_name == "Germany" & year == 2016) %>% select(energy_used)`* , *`r binded_hydro %>% filter(country_name == "Germany" & year == 2017) %>% select(energy_used)`* and in *`r binded_hydro %>% filter(country_name == "Germany" & year == 2018) %>% select(energy_used)`* have reduced the amount of energy consumed/absorbed for production of energy.
 
@@ -779,7 +784,7 @@ Figure \@ref(fig:target-plot) shows the % share of renewable energy consumed fro
 
 The dot point in 2020 represents the 2020 target for the respective country. Please take note that some countries do not have a target value as is mentioned in the limitations section. Also there is no value recorded for 2019 and so this does not appear on the graph. 
 
-From the graph, countries like Iceland, Finland, Norway and Sweden have the highest share of renewable energy. Norway consumed 72.75% of it's energy as renewable energy in 2018, followed by Iceland at 72.18%, Norway at 54.64% and Finland at 41.16%. Although Iceland and Norway don't have a 2020 target, they are well above their European counterparts and it is fair to say they have surpassed all renewable energy target level. Finland has surpassed their 2020 target level in 2014 and Sweden all the back in 2012!
+From the graph, countries like Iceland, Finland, Norway and Sweden have the highest share of renewable energy. Norway consumed `r euro_table %>% filter(Country == "Norway" & Year == 2018) %>% select(Percentage)`% of it's energy as renewable energy in 2018, followed by Iceland at 72.18%, Norway at 54.64% and Finland at 41.16%. Although Iceland and Norway don't have a 2020 target, they are well above their European counterparts and it is fair to say they have surpassed all renewable energy target level. Finland has surpassed their 2020 target level in 2014 and Sweden all the back in 2012!
 
 Cyprus, Denmark, Germany and the United Kingdom have a trend that is most noticeable to see as countries with the share of renewable energy consistently increasing over the years. Cyprus has increased from 6.1% in 13.8% and have already surpassed their 2020 target level of 13%! Denmark reported the largest increase over the 9 year period from 21.8% to 35.7% and reached their 2020 target of 30% way back in 2015! Germany has increased 11.6% to 16.4% and are on track to reach their 2020 target of 18%. The United Kingdom has increased from 3.7% to 11% and are on track to reach their 2020 target of 15%.
 
@@ -793,9 +798,11 @@ When assessing the exports to imports of energy across Europe we can see France 
 
 The energy type contribution of each country is still dominated by conventional thermal. Some countries like Albania and Denmark supply electricity in their country using renewable energy sources like hydro and wind power respectively. Although several countries have implemented solar power as an energy source, it only provides a small percentage of energy supply.
 
-The pumped hydro power which was earlier included within the hydro power analysis, also showed it's contribution to the energy production. Although it does not produce the high amounts of energy as the other energy types, it is still being used and improved for better production. Furthermore, the pumped hydro consumes more amount of energy than it produces in 2016 & 2017, but this has improved in countries like Austria and Norway in 2018. However, they are still not producing a high amount of energy that is comparable with other renewable energy sources.
+The pumped hydro power which was earlier included within the hydro power analysis, also showed it's contribution to the energy production. Although it does not produce the high amount of energy as the other energy types, it is still being used and improved for better production. We expected none of the energy types to absorb energy from other energy types for its energy production. However, during our data analysis, we found out that pumped hydro power absorbs energy to produce energy. In fact, pumped hydro power consumes more amount of energy than it produces in 2016 & 2017, but this has improved in countries like Austria and Norway in 2018. However, pumped hydro power is still not producing a high amount of energy that is comparable with other renewable energy sources.
 
 Many countries have in fact surpassed their 2020 target level by 2018. Countries like Iceland, Norway, Sweden, Finland and Denmark are dominating the field and charging ahead of the pack to cement their status as the front runners in sustainability practices. Thus we can conclude that the European continent is adopting more of a renewable energy source as the means to generate, supply and consume its energy. This helps us to answer our original question and we can confidently say Europe is leading towards a more sustainable future as they adopt a renewable energy consumption approach.
+
+
 
 # References
 
