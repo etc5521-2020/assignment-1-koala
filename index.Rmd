@@ -659,7 +659,7 @@ In figure \@ref(fig:cmp), we utilized a coding tip we learnt in lecture 4 to hel
 
 Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power. When researching into hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source (@altenergymag).
 
-Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp). We notice that the electricity produced by hydro power is higher than that of pumped hydro power. For example, Norway clearly shows that there is a huge amount of difference in the electricity production where the energy produced by hydro power is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% pull(avg_energy)` ** Gwh for year 2016,**`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% pull(avg_energy)` ** Gwh for year 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% pull(avg_energy)`** Gwh for year 2018. Whereas, electricity produced by the same country through the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% pull(pumped_hydro_power)`** Gwh for year 2016 , **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% pull(pumped_hydro_power)` ** Gwh for year 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% pull(pumped_hydro_power)`** Gwh for the year 2018.
+Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp). We notice that the electricity produced by hydro power is higher than that of pumped hydro power. For example, Norway clearly shows that there is a huge amount of difference in the electricity production where the energy produced by hydro power is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% pull(avg_energy)` ** Gwh for 2016, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% pull(avg_energy)` ** Gwh for 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% pull(avg_energy)`** Gwh for 2018. Whereas, electricity produced by the same country through the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% pull(pumped_hydro_power)`** Gwh for 2016, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% pull(pumped_hydro_power)` ** Gwh for 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% pull(pumped_hydro_power)`** Gwh for 2018.
 
 Just like Norway, every other country has a very low amount of pumped hydro power produced compared to the hydro power. Some of the countries like Georgia and Serbia have very low counts of hydro power but even less or around 0 GWh amount of electricity produced by either of the two techniques meaning either they do not use pumped hydro power as one of their techniques or the data is not available for us.
 
@@ -754,7 +754,7 @@ xaxis3 = list(title = ""))
 
 Now, we compared the two dataframes, energy_types and country_totals for the energy type "Pumped hydro power". There was something out of the ordinary in the country_totals table where the column type had a value *"energy absorbed for pumping"*, which really caught our attention. On further analyzing what this could be, we compared the amount of electricity produced by the pumped hydro power and the amount of energy consumed by the pumped hydro power to produce the same energy for different countries.
 
-Figure \@ref(fig:pumped-power) shows a bar graph with countries on its y-axis and the difference in energy produced & absorbed within each of those countries across three years shown on the x-axis. **The years 2016 and 2017 have negative values which indicates that the energy absorbed by the pumped hydro power technique was higher than the energy it produced **. Although 2018 is also similar and holds true to the above statement, there are some countries which have improved its consumption:production ratio over the years. For instance, let's have a look at Austria which has showed a significant change through the years with a energy production of **`r binded_hydro %>% filter(country_name == "Austria" & year == 2016) %>% pull(Diff_prod)`** Gwh in year 2016 but in **`r binded_hydro %>% filter(country_name == "Austria" & year == 2018) %>% pull(Diff_prod)`** Gwh for the year 2018, it was one of the top countries for having a huge turn over in the consumption:production ratio. Countries like Germany had more consumption than production with **`r binded_hydro %>% filter(country_name == "Germany" & year == 2016) %>% pull(Diff_prod)`** Gwh in the year 2016 , although it had a slight decrease in the consumption of energy with **`r binded_hydro %>% filter(country_name == "Germany" & year == 2017) %>% pull(Diff_prod)`** in the year 2017, they are still working towards reduction of consumption:production ratio with **`r binded_hydro %>% filter(country_name == "Germany" & year == 2018) %>% pull(Diff_prod)`** in the year 2018 which is good. (minus values indicate that the consumption is higher than the production rate of energy)
+Figure \@ref(fig:pumped-power) shows a bar graph with countries on its y-axis and the difference in energy produced & absorbed within each of those countries across three years shown on the x-axis. **The years 2016 and 2017 have negative values which indicates that the energy absorbed by the pumped hydro power technique was higher than the energy it produced **. Although 2018 is also similar and holds true to the above statement, there are some countries which have improved its consumption:production ratio over the years. For instance, let's have a look at Austria which has showed a significant change through the years with an energy production of **`r binded_hydro %>% filter(country_name == "Austria" & year == 2016) %>% pull(Diff_prod)`** Gwh in 2016 but in **`r binded_hydro %>% filter(country_name == "Austria" & year == 2018) %>% pull(Diff_prod)`** Gwh for 2018, it was one of the top countries for having a huge turn over in the consumption:production ratio. Countries like Germany had more consumption than production with **`r binded_hydro %>% filter(country_name == "Germany" & year == 2016) %>% pull(Diff_prod)`** Gwh in 2016 , although it had a slight decrease in the consumption of energy with **`r binded_hydro %>% filter(country_name == "Germany" & year == 2017) %>% pull(Diff_prod)`** in 2017, they are still working towards reduction of consumption:production ratio with **`r binded_hydro %>% filter(country_name == "Germany" & year == 2018) %>% pull(Diff_prod)`** in 2018 which is good. (minus values indicate that the consumption is higher than the production rate of energy)
 
 There are still many countries which have incorporated pumped hydro power for production of energy but are still lagging in reducing the consumption to production ratio.
 
@@ -801,24 +801,69 @@ The pumped hydro power which was earlier included within the hydro power analysi
 
 Many countries have in fact surpassed their 2020 target level by 2018. Countries like Iceland, Norway, Sweden, Finland and Denmark are dominating the field and charging ahead of the pack to cement their status as the front runners in sustainability practices. Thus we can conclude that the European continent is adopting more of a renewable energy source as the means to generate, supply and consume its energy. This helps us to answer our original question and we can confidently say Europe is leading towards a more sustainable future as they adopt a renewable energy consumption approach.
 
-# Acknowledgments
-
-@bookdown\
-@forcats\
-@ggplot2\
-@kableExtra\
-@knitr\
-@lubridate\
-@naniar\
-@plotly\
-@readr\
-@readxl\
-@scales\
-@tidytuesday\
-@tidyverse
-
-
 # References
 
+C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny.
+Chapman and Hall/CRC Florida, 2020.
 
-@energygif
+Ellis Hughes (2020). tidytuesdayR: Access the Weekly 'TidyTuesday' Project Dataset.
+https://CRAN.R-project.org/package=tidytuesdayR
+
+European Commission. (n.d.). *Energy Innovation made in the EU*. Retrieved September 17, 2020 from https://media.giphy.com/media/3oxHQlREH7ufJK4yYg/giphy.gif
+
+Eurostat. (2018). *Share of Renewable Energy in Gross Final Energy Consumption*. 
+Retrieved September 13, 2020 from https://ec.europa.eu/eurostat/tgm/table.do?tab=table&plugin=1&language=en&pcode=t2020_31
+
+Eurostat. (n.d.). *Your key to European Statistics*. Retrieved August 26, 2020 from https://ec.europa.eu/eurostat/web/energy/methodology
+
+Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with
+lubridate. Journal of Statistical Software, 40(3), 1-25. 
+URL http://www.jstatsoft.org/v40/i03/.
+
+Hadley Wickham (2020). forcats: Tools for Working with Categorical Variables
+(Factors). R package version 0.5.0. https://CRAN.R-project.org/package=forcats
+
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York,
+2016.
+  
+Hadley Wickham, Jim Hester and Romain Francois (2018). readr: Read Rectangular
+Text Data. R package version 1.3.1. https://CRAN.R-project.org/package=readr
+  
+Hadley Wickham and Jennifer Bryan (2019). readxl: Read Excel Files. R package
+version 1.3.1. https://CRAN.R-project.org/package=readxl
+
+Hadley Wickham and Dana Seidel (2020). scales: Scale Functions for Visualization.
+R package version 1.1.1. https://CRAN.R-project.org/package=scales
+
+Hao Zhu (2019). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax.
+R package version 1.1.0. https://CRAN.R-project.org/package=kableExtra
+
+Jones, D., Sakhel, A., Buck, M., Graichen, P., (2018, January). *The European Power Sector in 2017*. Retrieved August 26, 2020 from https://ember-climate.org/wp-content/uploads/2018/01/EU-power-sector-report-2017.pdf
+
+Mock, J., Scherer, C. (2020). *European Energy*. Retrieved September 13, 2020 from https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-08-04/readme.md
+
+Nicholas Tierney, Di Cook, Miles McBain and Colin Fay (2020). naniar: Data
+Structures, Summaries, and Visualisations for Missing Data. R package version
+0.5.2. https://CRAN.R-project.org/package=naniar
+
+Peninsula Clean Energy. (2018). *What is the difference between clean and renewable energy?*. Retrieved August 26, 2020 from https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-clean-and-renewable-energy/
+
+Petrescu, F., Petrescu, R. (2015). *Hydropower and Pumped-storage*. Retrieved September 16, 2020 from 
+https://www.altenergymag.com/article/2015/11/hydropower-and-pumped-storage/22104#:~:text=The%20pumped%20storage%20provides%20a,enabling%20additional%20system%20peak%20capacity.&text=Hydropower%20or%20water%20power%20is,be%20harnessed%20for%20useful%20purposes.
+
+R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/
+
+Ritchie, H., Roser, M. (2018) *Energy*. Retrieved August 26, 2020 from https://ourworldindata.org/energy
+
+Tribout-Maurizi, A. (2019). *FRANCE*. Retrieved August 27, 2020 from https://cnpp.iaea.org/countryprofiles/France/France.htm
+
+Twardy, S., Starr, C., DeWitt, S., Frostic, M., (2007). *Greenhouse Gases Effect on Global Warming*. Retrieved August 26, 2020 from https://svs.gsfc.nasa.gov/20114
+
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
+4(43), 1686, https://doi.org/10.21105/joss.01686
+
+Yihui Xie (2020). bookdown: Authoring Books and Technical Documents with R 
+Markdown. R package version 0.20.
+
+Yihui Xie (2020). knitr: A General-Purpose Package for Dynamic Report Generation
+in R. R package version 1.29.
