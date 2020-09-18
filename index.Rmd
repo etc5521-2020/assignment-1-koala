@@ -163,17 +163,6 @@ tibble(variables_2,class_2,desc_2) %>%
 
 The data in the tidytuesday package only contains yearly totals from 2016-2018, (@tidytuesday). However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information, (@methodology_eurostat).
 
-```{r target-energy, eval=FALSE}
-target_energy <- read_tsv("data/t2020_31.tsv")
-write.csv(target_energy, 'target_energy.csv')
-target_energy <- read_csv("data/target_energy.csv")
-```
-
-```{r, eval=FALSE}
-target_energy <- target_energy[c(-12,-13,-14), 2:18]
-target_energy <- as_tibble(target_energy) 
-```
-
 ```{r tidying-data, include=FALSE}
 euro_table <- read_xls("data/euro_table.xls") #reading in data
 euro_table <- euro_table %>% rename(Country = `Share of renewable energy in gross final energy consumption`,
@@ -316,8 +305,9 @@ yearly_production_plot <- energy_types %>%
   geom_col() +
   facet_wrap(~year) +
   theme(axis.text.x = element_text(angle = 90), #rotating the x axis to prevent values overlapping 
-        axis.title.y = element_text(vjust=1),
-        legend.position = "none") + #moving the y axis labels to prevent the text overlapping the y axis values 
+        axis.title.y = element_text(vjust=1), #moving the y axis labels to prevent the text overlapping the y axis values 
+        legend.position = "none", #removing legend
+        plot.title = element_text(hjust = 0.5)) + #centering the plot title
   labs(title = "Total Energy Production by Type and Year",
        x = "",
        y = "")
@@ -527,7 +517,7 @@ p <- contribute_to_europe %>%
         axis.text.y = element_text(size=7), 
         axis.title.y = element_text(size=6),
         axis.title.x = element_text(size=6),
-        plot.title = element_text(size = 10, face = "bold"),
+        plot.title = element_text(size = 10, hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(size = 9, face = "bold"))
 
 ggplotly(a, tooltip = c("fill","y"))
@@ -558,7 +548,7 @@ df_tbl %>%
         axis.text.y = element_text(size=7),
         axis.title.y = element_blank(),
         axis.title.x = element_text(size=6),
-        plot.title = element_text(size = 10, face = "bold"),
+        plot.title = element_text(size = 10, hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(size = 9, face = "bold"))
 }
 ```
@@ -787,7 +777,7 @@ From the graph, countries like Iceland, Finland, Norway and Sweden have the high
 
 Cyprus, Denmark, Germany and the United Kingdom have a trend that is most noticeable to see as countries with the share of renewable energy consistently increasing over the years. Cyprus has increased from *`r euro_table %>% filter(Country == "Cyprus" & Year == 2010) %>% select(Percentage)`%* in *`r euro_table %>% filter(Country == "Cyprus" & Year == 2018) %>% select(Percentage)`%* and have already surpassed their 2020 target level of *`r euro_table %>% filter(Country == "Cyprus" & Year == 2020) %>% select(Percentage)`%*! Denmark reported the largest increase over the 9 year period from *`r euro_table %>% filter(Country == "Denmark" & Year == 2010) %>% select(Percentage)`%* to *`r euro_table %>% filter(Country == "Denmark" & Year == 2018) %>% select(Percentage)`%* and reached their 2020 target of *`r euro_table %>% filter(Country == "Denmark" & Year == 2020) %>% select(Percentage)`%* way back in 2015! Germany has increased *`r euro_table %>% filter(Country == "Germany" & Year == 2010) %>% select(Percentage)`%* to *`r euro_table %>% filter(Country == "Germany" & Year == 2018) %>% select(Percentage)`%* and are on track to reach their 2020 target of *`r euro_table %>% filter(Country == "Germany" & Year == 2020) %>% select(Percentage)`%*. The United Kingdom has increased from *`r euro_table %>% filter(Country == "United Kingdom" & Year == 2010) %>% select(Percentage)`%* to *`r euro_table %>% filter(Country == "United Kingdom" & Year == 2018) %>% select(Percentage)`%* and are on track to reach their 2020 target of *`r euro_table %>% filter(Country == "United Kingdom" & Year == 2020) %>% select(Percentage)`%*.
 
-Albania and Montenegro have been going down in the share of their renewable energy. Montenegro has reported a 5.2% reduction dropping from *`r euro_table %>% filter(Country == "Montenegro" & Year == 2014) %>% select(Percentage)`%* in 2014 to *`r euro_table %>% filter(Country == "Montenegro" & Year == 2018) %>% select(Percentage)`%* in 2018. Albania has seen an inconsistent trend and recently dropped to *`r euro_table %>% filter(Country == "Albania" & Year == 2018) %>% select(Percentage)`%* in 2018 from an all time high of *`r euro_table %>% filter(Country == "Albania" & Year == 2016) %>% select(Percentage)`%* in 2016.
+Albania and Montenegro have been going down in the share of their renewable energy. Montenegro has reported a 5.3% reduction dropping from *`r euro_table %>% filter(Country == "Montenegro" & Year == 2014) %>% select(Percentage)`%* in 2014 to *`r euro_table %>% filter(Country == "Montenegro" & Year == 2018) %>% select(Percentage)`%* in 2018. Albania has seen an inconsistent trend and recently dropped to *`r euro_table %>% filter(Country == "Albania" & Year == 2018) %>% select(Percentage)`%* in 2018 from an all time high of *`r euro_table %>% filter(Country == "Albania" & Year == 2016) %>% select(Percentage)`%* in 2016.
 
 # Conclusion 
 
@@ -809,12 +799,12 @@ Chapman and Hall/CRC Florida, 2020.
 Ellis Hughes (2020). tidytuesdayR: Access the Weekly 'TidyTuesday' Project Dataset.
 https://CRAN.R-project.org/package=tidytuesdayR
 
-European Commission. (n.d.). *Energy Innovation made in the EU*. Retrieved September 17, 2020 from https://media.giphy.com/media/3oxHQlREH7ufJK4yYg/giphy.gif
+European Commission. (n.d.). *Energy Innovation made in the EU*. Retrieved September 17, 2020, from https://media.giphy.com/media/3oxHQlREH7ufJK4yYg/giphy.gif
 
 Eurostat. (2018). *Share of Renewable Energy in Gross Final Energy Consumption*. 
-Retrieved September 13, 2020 from https://ec.europa.eu/eurostat/tgm/table.do?tab=table&plugin=1&language=en&pcode=t2020_31
+Retrieved September 13, 2020, from https://ec.europa.eu/eurostat/tgm/table.do?tab=table&plugin=1&language=en&pcode=t2020_31
 
-Eurostat. (n.d.). *Your key to European Statistics*. Retrieved August 26, 2020 from https://ec.europa.eu/eurostat/web/energy/methodology
+Eurostat. (n.d.). *Your key to European Statistics*. Retrieved August 26, 2020, from https://ec.europa.eu/eurostat/web/energy/methodology
 
 Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with
 lubridate. Journal of Statistical Software, 40(3), 1-25. 
@@ -838,26 +828,26 @@ R package version 1.1.1. https://CRAN.R-project.org/package=scales
 Hao Zhu (2019). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax.
 R package version 1.1.0. https://CRAN.R-project.org/package=kableExtra
 
-Jones, D., Sakhel, A., Buck, M., Graichen, P., (2018, January). *The European Power Sector in 2017*. Retrieved August 26, 2020 from https://ember-climate.org/wp-content/uploads/2018/01/EU-power-sector-report-2017.pdf
+Jones, D., Sakhel, A., Buck, M., Graichen, P., (2018, January). *The European Power Sector in 2017*. Retrieved August 26, 2020, from https://ember-climate.org/wp-content/uploads/2018/01/EU-power-sector-report-2017.pdf
 
-Mock, J., Scherer, C. (2020). *European Energy*. Retrieved September 13, 2020 from https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-08-04/readme.md
+Mock, J., Scherer, C. (2020). *European Energy*. Retrieved September 13, 2020, from https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-08-04/readme.md
 
 Nicholas Tierney, Di Cook, Miles McBain and Colin Fay (2020). naniar: Data
 Structures, Summaries, and Visualisations for Missing Data. R package version
 0.5.2. https://CRAN.R-project.org/package=naniar
 
-Peninsula Clean Energy. (2018). *What is the difference between clean and renewable energy?*. Retrieved August 26, 2020 from https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-clean-and-renewable-energy/
+Peninsula Clean Energy. (2018). *What is the difference between clean and renewable energy?*. Retrieved August 26, 2020, from https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-clean-and-renewable-energy/
 
-Petrescu, F., Petrescu, R. (2015). *Hydropower and Pumped-storage*. Retrieved September 16, 2020 from 
+Petrescu, F., Petrescu, R. (2015). *Hydropower and Pumped-storage*. Retrieved September 16, 2020, from 
 https://www.altenergymag.com/article/2015/11/hydropower-and-pumped-storage/22104#:~:text=The%20pumped%20storage%20provides%20a,enabling%20additional%20system%20peak%20capacity.&text=Hydropower%20or%20water%20power%20is,be%20harnessed%20for%20useful%20purposes.
 
 R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/
 
-Ritchie, H., Roser, M. (2018) *Energy*. Retrieved August 26, 2020 from https://ourworldindata.org/energy
+Ritchie, H., Roser, M. (2018) *Energy*. Retrieved August 26, 2020, from https://ourworldindata.org/energy
 
-Tribout-Maurizi, A. (2019). *FRANCE*. Retrieved August 27, 2020 from https://cnpp.iaea.org/countryprofiles/France/France.htm
+Tribout-Maurizi, A. (2019). *FRANCE*. Retrieved August 27, 2020, from https://cnpp.iaea.org/countryprofiles/France/France.htm
 
-Twardy, S., Starr, C., DeWitt, S., Frostic, M., (2007). *Greenhouse Gases Effect on Global Warming*. Retrieved August 26, 2020 from https://svs.gsfc.nasa.gov/20114
+Twardy, S., Starr, C., DeWitt, S., Frostic, M., (2007). *Greenhouse Gases Effect on Global Warming*. Retrieved August 26, 2020, from https://svs.gsfc.nasa.gov/20114
 
 Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
 4(43), 1686, https://doi.org/10.21105/joss.01686
