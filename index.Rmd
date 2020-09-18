@@ -69,7 +69,7 @@ h4.date {
 
 # Introduction and motivation
 
-In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy, fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (Ritchie and Roser, 2018, peninsula?) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (Twardy et al., 2007). Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time”. This causes energy producers and companies to charge consumers based on demand, and as demand fluctuates, this results in long-term price volatility.
+In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy, fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (Peninsula Clean Energy, 2018) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (Twardy et al., 2007). Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time”. This causes energy producers and companies to charge consumers based on demand, and as demand fluctuates, this results in long-term price volatility.
 
 Per Our World Data, Europe is currently the 3rd highest consumer of primary energy behind Asia Pacific and North America making up approximately 15% of the total World Energy Consumption (Ritchie and Roser, 2018).  
 
@@ -838,7 +838,7 @@ Structures, Summaries, and Visualisations for Missing Data. R package version
 Peninsula Clean Energy. (2018). *What is the difference between clean and renewable energy?*. Retrieved August 26, 2020, from https://www.peninsulacleanenergy.com/faq-items/what-is-the-difference-between-clean-and-renewable-energy/
 
 Petrescu, F., Petrescu, R. (2015). *Hydropower and Pumped-storage*. Retrieved September 16, 2020, from 
-https://www.altenergymag.com/article/2015/11/hydropower-and-pumped-storage/22104#:~:text=The%20pumped%20storage%20provides%20a,enabling%20additional%20system%20peak%20capacity.&text=Hydropower%20or%20water%20power%20is,be%20harnessed%20for%20useful%20purposes.
+https://www.altenergymag.com/article/2015/11/hydropower-and-pumped-storage/22104#
 
 R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/
 
