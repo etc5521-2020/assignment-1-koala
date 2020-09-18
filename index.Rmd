@@ -15,7 +15,6 @@ output:
     toc: yes
     toc_float:
       collapsed: yes
-bibliography: references.bib  
 ---
 
 [This assignment is for ETC5521 Assignment 2 by Team `r rmarkdown::metadata$team` comprising of `r rmarkdown::metadata$author[1]` & `r rmarkdown::metadata$author[2]`.]{style="color:#006DAE;"}
@@ -70,11 +69,11 @@ h4.date {
 
 # Introduction and motivation
 
-In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy, fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (@peninsula_2018) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (@twardy_greenhouse_2007). Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time”. This causes energy producers and companies to charge consumers based on demand, and as demand fluctuates, this results in long-term price volatility.
+In today's day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy, fossil fuels "produce a significant amount of greenhouse gas emissions, including carbon dioxide methane," (Ritchie and Roser, 2018, peninsula?) These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” (Twardy et al., 2007). Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time”. This causes energy producers and companies to charge consumers based on demand, and as demand fluctuates, this results in long-term price volatility.
 
-Per Our World Data, Europe is currently the 3rd highest consumer of primary energy behind Asia Pacific and North America making up approximately 15% of the total World Energy Consumption (@ritchie_energy_2014).  
+Per Our World Data, Europe is currently the 3rd highest consumer of primary energy behind Asia Pacific and North America making up approximately 15% of the total World Energy Consumption (Ritchie and Roser, 2018).  
 
-As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” (@energiewende_european_2018) in favor of cleaner and more renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) to assess how successful they currently are and answer the questions:  
+As a result, the European power sector currently plays a crucial role in attaining targets to “cut green-house gases by 40% by 2030, compared to 1990” (Jones et al., 2017) in favor of cleaner and more renewable energy sources. For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) to assess how successful they currently are and answer the questions:  
 
 
 How sustainable is the energy production in Europe? 
@@ -94,7 +93,7 @@ Additional Questions for Assignment 2 :
 
 We would like to address these new questions because we want to focus more on the original question, **"How sustainable is the energy production in Europe?"**. We think by picking out select renewable energy sources, like hydro power and pumped hydro power, it will help to give a more narrowed answer to the sustainability question. More specifically, it would be useful to see how the renewable energy sources we have selected compare across countries to visualize how these countries are trying to be more sustainable in their energy production.
 
-The original analysis excluded Pumped Hydro power. Pumped hydro power is listed as a level 2 energy type in the data, whereas Hydro power is listed as a level 1 energy type. The data in the tidytuesday package points out that level 2 makes up level 1 that makes up the total (@mock_scherer_2020), meaning energy produced by Pumped Hydro power is included in Hydro power's energy production, which is the total energy production for both. However, there is clearly a difference between both these energy sources and we think it'll be interesting to look into these differences.
+The original analysis excluded Pumped Hydro power. Pumped hydro power is listed as a level 2 energy type in the data, whereas Hydro power is listed as a level 1 energy type. The data in the tidytuesday package points out that level 2 makes up level 1 that makes up the total (Mock and Scherer, 2020), meaning energy produced by Pumped Hydro power is included in Hydro power's energy production, which is the total energy production for both. However, there is clearly a difference between both these energy sources and we think it'll be interesting to look into these differences.
 
 We also think it is interesting to look at how countries have been performing to reach their 2020 renewable energy target because it gives an overview into which country is taking a more proactive approach to becoming more sustainable. Thus, we are curious to see how countries have fared as of 2018 to see whether they are on track to reach their goal.
 
@@ -161,7 +160,7 @@ tibble(variables_2,class_2,desc_2) %>%
   kable_styling(bootstrap_options = "hover")
 ```
 
-The data in the tidytuesday package only contains yearly totals from 2016-2018, (@tidytuesday). However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information, (@methodology_eurostat).
+The data in the tidytuesday package only contains yearly totals from 2016-2018, (Ellis, 2020). However, monthly data can be found on the Eurostat website including data from 2010 until May 2020 as at 14-08-20. The statistics are collected and compiled by Member States. Eurostat prepared a template to gather this information, (Eurostat, n.d.).
 
 ```{r tidying-data, include=FALSE}
 euro_table <- read_xls("data/euro_table.xls") #reading in data
@@ -209,7 +208,7 @@ euro_table$Year <- as.Date(as.character(euro_table$Year), format = "%Y") #changi
 euro_table$Year <- year(euro_table$Year) #Taking only the year of the date
 ```
 
-To answer how the trend has been for EU countries to reach their 2020 target, we needed further data. Thus we obtained an external dataset from the Eurostat website which provides information on each European country's renewable energy % share of the final energy consumption. The data is in a tabular format and provides the % share values from 2009-2018 and a target column which represents the country's 2020 target value, (@eurostat_2018). The source of this data is accredited to the European Environment Agency (EEA).
+To answer how the trend has been for EU countries to reach their 2020 target, we needed further data. Thus we obtained an external dataset from the Eurostat website which provides information on each European country's renewable energy % share of the final energy consumption. The data is in a tabular format and provides the % share values from 2009-2018 and a target column which represents the country's 2020 target value, (Eurostat, 2020). The source of this data is accredited to the European Environment Agency (EEA).
 
 The variables in the `euro_table` table are included below in Table \@ref(tab:euro-tab-vr): 
 
@@ -327,7 +326,7 @@ ggplotly(yearly_production_plot, tooltip = "y") %>% #outputting yearly_productio
 
 ## How do energy imports vs exports compare between countries in Europe from 2016-2018?
 
-Per Our World Data Europe only makes up 15% of the total World Energy Consumption (@ritchie_energy_2014). Therefore, to assess the global impact of Europe's renewable energy production we are interested in assessing the energy imports and exports of each country. Using the country_totals we have created the plot in Figure \@ref(fig:export-import-plot) showing the average exports on the positive y-axis and imports on the negative y-axis for each country across 2016-2018. Further points were added to visualize the net export less imports with the size of the point representing the total net production. We have decided to use the average across 2016-2018 as there is not a significant change in energy exports and imports across the 3 years.
+Per Our World Data Europe only makes up 15% of the total World Energy Consumption (Ritchie and Roser, 2018). Therefore, to assess the global impact of Europe's renewable energy production we are interested in assessing the energy imports and exports of each country. Using the country_totals we have created the plot in Figure \@ref(fig:export-import-plot) showing the average exports on the positive y-axis and imports on the negative y-axis for each country across 2016-2018. Further points were added to visualize the net export less imports with the size of the point representing the total net production. We have decided to use the average across 2016-2018 as there is not a significant change in energy exports and imports across the 3 years.
 
 From the visualization we can see Germany, France, Sweden, Norway and Czechia are the leading 5 countries in net exports less imports. Furthermore from the first visualization Figure \@ref(fig:average-production-plotly) these countries lead Europe in the production of renewable energy with Germany and France being Europe's largest total net producer of energy showing signs of not only the production of renewable energy for local use but net exportation of renewable energy also. Further, from the visualization we can see Italy, Finland, United, Kingdom, Hungry and Belgium lead in net imports (imports greater than exports) in Europe.
 
@@ -523,7 +522,7 @@ p <- contribute_to_europe %>%
 ggplotly(a, tooltip = c("fill","y"))
 ```
 
-Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-3y). In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs for their country. However, it is interesting that Albania relies almost mostly on Hydro power. The same situation occurs in Norway and Georgia which rely on Hydro power to provide them more than 80% of their energy source. Meanwhile, the energy intake in France, Slovakia, and Hungary are dominated by nuclear power. France has 58 nuclear power reactors and is the highest country with almost 71% nuclear contribution for its country, (@iaea_country). While Slovakia and Hungary have more than 50% nuclear energy contribution. Denmark is the country with the most significant wind power utilization with nearly 48%, followed by Lithuania and Ireland at 32% and 25% respectively. As for solar energy, many have adopted it, but it is not that popular. The top 3 countries that utilize solar power are Italy, Greece and Germany where it produces about 8%, 7.7% and 6.85% respectively. Only Italy and Turkey use geothermal as an energy source producing around 2%.
+Now let us look at the presentation of the energy types for each country in Figure \@ref(fig:plot-contribution-country-3y). In general, the majority of countries in Europe rely on thermal energy as the leading supplier of energy needs for their country. However, it is interesting that Albania relies almost mostly on Hydro power. The same situation occurs in Norway and Georgia which rely on Hydro power to provide them more than 80% of their energy source. Meanwhile, the energy intake in France, Slovakia, and Hungary are dominated by nuclear power. France has 58 nuclear power reactors and is the highest country with almost 71% nuclear contribution for its country, (Tribout-Maurizi, 2019). While Slovakia and Hungary have more than 50% nuclear energy contribution. Denmark is the country with the most significant wind power utilization with nearly 48%, followed by Lithuania and Ireland at 32% and 25% respectively. As for solar energy, many have adopted it, but it is not that popular. The top 3 countries that utilize solar power are Italy, Greece and Germany where it produces about 8%, 7.7% and 6.85% respectively. Only Italy and Turkey use geothermal as an energy source producing around 2%.
 
 ```{r plot-contribution-country, fig.cap="The proportion of each energy type to the total energy production in each country"}
 create_plot <- function(df){
@@ -647,7 +646,7 @@ subplot(diff_plotly,hydro_plotly,margin = 0.10,titleX = TRUE,titleY = TRUE) %>%
 
 In figure \@ref(fig:cmp), we utilized a coding tip we learnt in lecture 4 to help us visualize the plot better. We used the "forcats::fct_reorder" function to reorder the way the countries are arranged. Our code displays the countries' value in a descending order. Thus countries with a lower difference value/ pumped hydro value will be displayed last. However, since we used the "coord_flip" function, we reversed the axes and now our graph appears to show countries with a lower difference value/ pumped hydro value at the top of the plot.
 
-Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power. When researching into hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source (@altenergymag).
+Looking at the metadata and dataset, we notice that the pumped hydro power and hydro power have been put together as electricity produced by hydro power. When researching into hydro power and pumped hydro power, it can be said that they are different ways of producing electricity using water as their source (Petrescu, 2015).
 
 Hence, we can find the amount of electricity produced by each of the techniques using a bar graph such as \@ref(fig:cmp). We notice that the electricity produced by hydro power is higher than that of pumped hydro power. For example, Norway clearly shows that there is a huge amount of difference in the electricity production where the energy produced by hydro power is **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2016) %>% pull(avg_energy)` ** Gwh for 2016, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2017) %>% pull(avg_energy)` ** Gwh for 2017, **`r  hydro_pro %>% filter(country_name == "Norway" & year == 2018) %>% pull(avg_energy)`** Gwh for 2018. Whereas, electricity produced by the same country through the pumped hydro power technique is **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2016) %>% pull(pumped_hydro_power)`** Gwh for 2016, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2017) %>% pull(pumped_hydro_power)` ** Gwh for 2017, **`r  electricity_prod %>% select(country_name,pumped_hydro_power) %>%  filter(country_name == "Norway" & year == 2018) %>% pull(pumped_hydro_power)`** Gwh for 2018.
 
