@@ -761,21 +761,18 @@ There are still many countries which have incorporated pumped hydro power for pr
 ## What has the trend been like for EU countries to achieve their 2020 renewable energy target?
 
 ```{r target-plot,fig.cap="Percentage of renewable energy consumed from 2010 - 2018",fig.width=10,fig.height=8}
-target <- #filtering only the years 2010-2018
-ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) +
+target <- 
+ggplot(euro_table %>% filter(Year %in% c(2010,2011,2012,2013,2014,2015,2016,2017,2018)), aes(x=Year, y=Percentage, color=Country)) + #filtering only the years 2010-2018
   geom_line() +
   geom_point(data = euro_table %>% filter(Year == 2020)) + #filtering only to show the target value (2020) as a dot point on the graph
-  #annotate("text", x = 2020, y = 43, label = "2020 Target", colour = "red", size = 3) + #adding a text on the graph to clearly show the dot point is the "2020 Target"
   scale_y_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) + #adding breaks to the y-axis
   scale_x_continuous(breaks = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2020)) + #adding breaks on the x-axis to show every year from 2010-2018
   theme(axis.text.x = element_text(angle = 90)) + #rotating the x-axis labels by 90 degrees
-  ylab("Share of energy consumed that is renewable energy (%)") + #adding a y-axis label
-  ggtitle("Percentage of renewable energy consumed from 2010 - 2018") + #adding a plot title
+  xlab("") + #adding x-axis label
+  ylab("Renewable energy (%)") + #adding y-axis label
+  ggtitle("Renewable energy % share of total energy consumed for EU countries from 2010 - 2018") + #adding a plot title
   theme(legend.position = "none",               # excluding the legend
-        plot.title = element_text(hjust = 0.5), # centering the plot title
-        plot.margin = unit(c(0.5,0.5,0.5,0.5),"lines"),
-        #axis.title.y.left = element_text(margin = unit(c(0,0,0,1),"lines")),
-        axis.title.x = element_text(margin = unit(c(3,3,5,3),"lines"))) + 
+        plot.title = element_text(hjust = 0.5)) + # centering the plot title
   facet_wrap(~Country, ncol = 9) #display a line graph for each country
 
 ggplotly(target) 
