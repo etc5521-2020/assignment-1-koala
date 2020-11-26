@@ -1,3 +1,19 @@
+In today’s day and age there has been a strong push for the reduction in production and use of fossil fuels. Per Peninsula Energy fossil fuels “produce a significant amount of greenhouse gas emissions, including carbon dioxide methane,” [1] These greenhouse gas emissions are known to be a main contributor to the ‘greenhouse effect’ “the warming of climate that results when the atmosphere traps heat radiating from Earth towards space,” [2] Not only does thermal power produced by fossil fuels emit greenhouse gases, it is not renewable, meaning it cannot be “replaced naturally in a short period of time” resulting in long-term price volatility and unsustainability.
+
+For the purposes of this analysis we will be using Eurostat European Energy data (Eurostat, 2020) assess how successful they currently are and answer the question:
+
+How sustainable is the energy production in Europe?
+
+Specifically:
+
+* Which countries have the highest production of sustainable energy based on energy types?
+* How do energy imports vs exports compare between countries in Europe from 2016-2018?
+* How the contributions of the sources to the production of electricity?
+
+
+
+
+
 # ETC5521 Assignment 1 
 
 Team name: Koala
